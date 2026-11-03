@@ -1,5 +1,7 @@
 # Design Direction
 
+**Figma prototype:** https://www.figma.com/design/zgikhuRluw2ekbDlHqkG2H — frames: Home — Desktop 1440, Custom Build — Desktop 1440, Home — Mobile 390, Motion notes, Components (Button, SpecTag, Swatch, PhotoPlaceholder, ProductCard) and colour variables.
+
 From Dribbble + real 3D-print sites research (Nov 3, 2026). Base template: Stride (Astro). Motion: GSAP + ScrollTrigger, Lenis, Swiper.
 
 ## References

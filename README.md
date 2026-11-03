@@ -20,7 +20,7 @@ QR/NFC stands for local businesses, and battery/tool wall mounts — plus custom
 ## Status
 
 1. Plan + research — done
-2. Design prototype in Figma — in progress
+2. Design prototype in Figma — first pass done (https://www.figma.com/design/zgikhuRluw2ekbDlHqkG2H)
 3. Build the site from the Stride template — next
 
 ```bash
