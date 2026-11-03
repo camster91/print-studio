@@ -1,0 +1,31 @@
+{
+  "_note": "Layerline launch catalog (Nov 3, 2026). Prices CAD. type: in-stock | made-to-order. Full research + sources: docs/catalog.md",
+  "products": [
+    { "slug": "m18-battery-mount-5-pack", "name": "Battery Mount 5-Pack", "fits": "Milwaukee M18", "type": "in-stock", "category": "garage", "price": 28, "materialCost": 5, "printHours": 5, "material": "PETG", "colours": 1, "options": { "colour": ["Red", "Black", "Grey"] } },
+    { "slug": "dewalt-20v-battery-mount-6-pack", "name": "Battery Mount 6-Pack", "fits": "DeWalt 20V", "type": "in-stock", "category": "garage", "price": 22, "materialCost": 5, "printHours": 5, "material": "PETG", "colours": 1, "options": { "colour": ["Yellow", "Black", "Grey"] } },
+    { "slug": "ryobi-tool-holder-5-pack", "name": "Tool Holder 5-Pack", "fits": "Ryobi ONE+", "type": "in-stock", "category": "garage", "price": 24, "materialCost": 5, "printHours": 5, "material": "PETG", "colours": 1, "options": { "colour": ["Green", "Black"] } },
+    { "slug": "skadis-hook-8-pack", "name": "Skadis Hook 8-Pack", "fits": "IKEA Skadis", "type": "in-stock", "category": "home", "price": 12, "materialCost": 2, "printHours": 1.5, "material": "PETG", "colours": 1, "options": { "colour": ["White", "Black", "Nozzle Orange"] } },
+    { "slug": "under-desk-headphone-hook", "name": "Under-Desk Headphone Hook", "type": "in-stock", "category": "desk", "price": 16, "materialCost": 1.5, "printHours": 1, "material": "PETG", "colours": 1, "options": { "colour": ["Black", "White"] } },
+    { "slug": "controller-wall-mount-4-pack", "name": "Controller Wall Mount 4-Pack", "fits": "PS5 / Xbox controllers", "type": "in-stock", "category": "desk", "price": 25, "materialCost": 3, "printHours": 3, "material": "PLA", "colours": 1, "options": { "colour": ["Black", "White"] } },
+    { "slug": "stream-deck-stand", "name": "Stream Deck Stand", "fits": "Elgato Stream Deck MK.2", "type": "in-stock", "category": "streamers", "price": 29, "materialCost": 3, "printHours": 2.5, "material": "PETG", "colours": 1, "options": { "colour": ["Black", "White"] } },
+    { "slug": "on-air-light-box", "name": "ON AIR Light Box", "type": "in-stock", "category": "streamers", "price": 45, "materialCost": 10, "printHours": 5, "material": "PLA", "colours": 2, "led": true, "options": { "colour": ["Red / Black", "White / Black"] } },
+    { "slug": "moon-lamp-10cm", "name": "Moon Lamp 10 cm", "type": "in-stock", "category": "gifts", "price": 49, "materialCost": 10, "printHours": 10, "material": "PLA", "colours": 1, "led": true, "options": {} },
+
+    { "slug": "lithophane-photo-box", "name": "Lithophane Photo Box", "type": "made-to-order", "category": "gifts", "price": 55, "materialCost": 8, "printHours": 10, "material": "PLA", "colours": 1, "led": true, "options": { "size": [{ "label": "80 mm", "price": 45 }, { "label": "100 mm", "price": 55 }, { "label": "150 mm", "price": 69 }], "frameColour": ["Black", "White", "Nozzle Orange", "Lagoon", "Signal Blue", "Ultraviolet"], "photos": 4 } },
+    { "slug": "pet-memorial-light", "name": "Pet Memorial Light", "type": "made-to-order", "category": "gifts", "price": 45, "materialCost": 6, "printHours": 4, "material": "PLA", "colours": 2, "led": true, "options": { "photos": 1, "text": "Pet's name and dates" } },
+    { "slug": "led-name-sign", "name": "LED Name Sign", "type": "made-to-order", "category": "streamers", "price": 55, "materialCost": 12, "printHours": 6, "material": "PLA", "colours": 2, "led": true, "options": { "text": "Name or channel (max 14 characters)", "colour": ["Black / White", "Black / Cyan", "Black / Magenta"] } },
+    { "slug": "personalised-headphone-stand", "name": "Personalised Headphone Stand", "type": "made-to-order", "category": "desk", "price": 39, "materialCost": 6, "printHours": 6, "material": "PLA", "colours": 2, "options": { "text": "Name (max 12 characters)" } },
+    { "slug": "desk-nameplate", "name": "Desk Nameplate", "type": "made-to-order", "category": "business", "price": 29, "bulk": [{ "min": 10, "price": 22 }], "materialCost": 2, "printHours": 2, "material": "PLA", "colours": 2, "options": { "text": "Name and title" } },
+    { "slug": "nursery-wall-name-sign", "name": "Nursery Wall Name Sign", "type": "made-to-order", "category": "gifts", "price": 39, "materialCost": 4, "printHours": 4, "material": "PLA", "colours": 1, "options": { "text": "Name (max 10 letters)" }, "safety": "Wall decor only. Mount out of reach of children. Not a toy." },
+    { "slug": "qr-review-stand", "name": "QR Review Stand", "type": "made-to-order", "category": "business", "price": 25, "bulk": [{ "min": 3, "price": 19.67 }], "setupFee": 15, "addOns": [{ "label": "NFC tap", "price": 15 }], "materialCost": 2, "printHours": 1.5, "material": "PLA", "colours": 2, "options": { "link": "Google review / payment / Wi-Fi link", "logo": true } },
+    { "slug": "cottage-lake-topo-map", "name": "Cottage Lake Topo Map", "type": "made-to-order", "category": "gifts", "price": 89, "materialCost": 8, "printHours": 12, "material": "PLA", "colours": 4, "options": { "place": "Lake or area name" }, "credit": "Elevation data: Natural Resources Canada (CDEM)" },
+    { "slug": "gridfinity-drawer-kit", "name": "Gridfinity Drawer Kit", "type": "made-to-order", "category": "home", "price": 39, "priceFrom": true, "materialCost": 12, "printHours": 15, "material": "PLA", "colours": 1, "options": { "drawer": "Inside width x depth x height (mm)" } }
+  ],
+  "phase2": [
+    "Lithophane Night Light", "Round Lithophane Light Frame", "Moon Lamp 15-20 cm", "Toronto Neighbourhood 3D Map", "Name / Initial Bookends",
+    "Shelf Name Sign", "Name Letter Lamp", "Photo Portrait Panel", "Low-Poly Dog Breed Lamp", "Pet Bust from Photo",
+    "Artisan Keycap Tray", "Steam Deck / Handheld Stand", "Under-Desk Cable Arches", "Echo Dot / Echo Glow Mounts",
+    "Charger Wall Mount (DeWalt DCB102)", "Packout Socket Insert", "Cup Holder Insert (RAV4, CR-V, F-150)",
+    "Logo Keychains (25+)", "League Trophies", "Bakery Cookie Cutters"
+  ]
+}
