@@ -82,7 +82,7 @@ The site sells three ways, shown as badges on every product:
 | Made to order | Personalised (name, photo, colour). Proof by email, made in 5–7 days. | Pay now; proof before printing |
 | Custom | Anything else via the custom build form. | Quote first, pay after approval (Stripe invoice / e-Transfer) |
 
-Payments: Astro cart (Stride `src/lib/cart.ts` backend section) → small Cloudflare Worker → Stripe Checkout. No monthly fee; per-sale card fee only. Shopify Basic (~$39 USD/mo) only if the catalogue outgrows this.
+Payments: Astro cart (Stride `src/lib/cart.ts` backend section) → small Cloudflare Worker → Stripe Checkout. No monthly fee; per-sale card fee only. **Decision (Nov 3, 2026): Stripe only** — Stripe Checkout for shop orders, Stripe invoices (or e-Transfer) for approved custom quotes. No Shopify.
 
 ## Figma file contents
 
