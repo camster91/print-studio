@@ -1,0 +1,132 @@
+---
+import { site } from '../config/site';
+---
+
+<div class="sticky" data-sticky inert>
+  <img class="sticky__thumb" src="/assets/images/swatch-green.avif" alt="" width="240" height="160" data-sticky-thumb />
+  <p class="sticky__info">
+    <span class="sticky__name t-label">{site.product.name}</span>
+    <span class="sticky__price t-cta">{site.price.now} <s>{site.price.was}</s></span>
+  </p>
+  <button
+    type="button"
+    class="sticky__cta btn t-cta"
+    data-add-to-cart
+    data-track="cta-sticky"
+    data-cue
+    data-id={site.product.id}
+    data-name={site.product.name}
+    data-price={site.product.price}
+    data-image={site.product.image}
+  >
+    <span class="btn__label">Add to bag</span>
+    <span class="btn__done" aria-hidden="true">
+      <img src="/assets/icons/check.svg" alt="" width="16" height="16" />
+      Added
+    </span>
+  </button>
+</div>
+
+<script>
+  // On phones the bar slides up once the hero's button has scrolled away, and slides
+  // back down while the closing section is on screen. Its thumbnail follows the colour
+  // that is picked.
+  const bar = document.querySelector<HTMLElement>('[data-sticky]');
+  const anchor = document.querySelector<HTMLElement>('.hero__purchase');
+  const final = document.querySelector<HTMLElement>('.final');
+  const phone = matchMedia('(max-width: 767px)');
+
+  if (bar && anchor && final) {
+    let queued = false;
+    const place = () => {
+      queued = false;
+      const show = phone.matches && anchor.getBoundingClientRect().bottom < 0 && final.getBoundingClientRect().top > innerHeight;
+      bar.classList.toggle('is-shown', show);
+      bar.inert = !show;
+    };
+    const schedule = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(place);
+    };
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', schedule);
+    place();
+
+    const thumb = bar.querySelector<HTMLImageElement>('[data-sticky-thumb]');
+    const sync = () => {
+      const image = document.querySelector<HTMLElement>('.hero__color[aria-pressed="true"]')?.dataset.image;
+      if (thumb && image) thumb.src = image;
+    };
+    document.addEventListener('click', (event) => {
+      if ((event.target as Element).closest('[data-cart-option]')) requestAnimationFrame(sync);
+    });
+    sync();
+  }
+</script>
+
+<style>
+  .sticky {
+    display: none;
+  }
+
+  @media (max-width: 767px) {
+    .sticky {
+      position: fixed;
+      inset: auto 0 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.625rem var(--container-padding) calc(0.625rem + env(safe-area-inset-bottom));
+      background-color: var(--color-bg-dark);
+      color: var(--color-accent);
+      translate: 0 calc(100% + 1.5rem);
+      transition: translate 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .sticky.is-shown {
+      translate: 0 0;
+    }
+
+    .sticky__thumb {
+      flex: none;
+      width: 3.5rem;
+      height: 2.5rem;
+      object-fit: contain;
+      border-radius: var(--radius-sm);
+      background-color: var(--color-bg-tile);
+    }
+
+    .sticky__info {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .sticky__name {
+      overflow: hidden;
+      color: var(--color-text-white);
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .sticky__price s {
+      opacity: 0.6;
+    }
+
+    .sticky__cta {
+      flex: none;
+      width: auto;
+      background-color: var(--color-accent);
+      color: var(--color-primary);
+    }
+  }
+
+  @media (max-width: 359px) {
+    .sticky__price s {
+      display: none;
+    }
+  }
+</style>

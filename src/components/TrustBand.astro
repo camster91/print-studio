@@ -1,0 +1,106 @@
+---
+const items = [
+  { icon: '/assets/icons/shield.svg', title: '1-year warranty', text: 'On all products' },
+  { icon: '/assets/icons/star-green.svg', title: '80,000+', text: 'Reviews, 4.9 average' },
+  { icon: '/assets/icons/shipping-green.svg', title: 'Free shipping', text: 'On every US order' },
+];
+---
+
+<section class="trust" aria-label="Why Stride" data-reveal="image">
+  <div class="trust__track">
+    {
+      [0, 1].map((copy) => (
+        <ul class="trust__list" aria-hidden={copy === 1 ? 'true' : undefined}>
+          {[...items, ...items, ...items].map((item, i) => (
+            <li class="trust__item" aria-hidden={copy === 0 && i >= items.length ? 'true' : undefined}>
+              <img src={item.icon} alt="" width="52" height="52" />
+              <div class="trust__text">
+                <p class="trust__title t-card">{item.title}</p>
+                <p class="t-small">{item.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .trust {
+    overflow: clip;
+    padding-block: 1.5rem;
+    background-color: var(--color-highlight);
+  }
+
+  .trust__track {
+    display: flex;
+    width: max-content;
+    animation: trust-marquee 60s linear infinite;
+  }
+
+  .trust__list {
+    display: flex;
+    flex: none;
+    gap: 6rem;
+    padding-right: 6rem;
+  }
+
+  .trust__item {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 1.5rem;
+  }
+
+  .trust__item img {
+    flex-shrink: 0;
+  }
+
+  .trust__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .trust__title {
+    color: var(--color-primary);
+  }
+
+  @keyframes trust-marquee {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trust__track {
+      animation: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .trust {
+      padding-block: 1.25rem;
+    }
+
+    .trust__track {
+      animation-duration: 45s;
+    }
+
+    .trust__list {
+      gap: 3rem;
+      padding-right: 3rem;
+    }
+
+    .trust__item {
+      gap: 1rem;
+    }
+
+    .trust__item img {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+</style>

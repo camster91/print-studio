@@ -1,0 +1,11 @@
+{
+  // Worker name. The first deploy creates the worker and it goes live at
+  // <name>.<account>.workers.dev
+  "name": "print-studio",
+  "compatibility_date": "2026-09-30",
+  // Purely static: Workers just serves the built dist/ as assets. No "main" entry-point.
+  "assets": {
+    "directory": "./dist"
+  },
+  "workers_dev": true
+}

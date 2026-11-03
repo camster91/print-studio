@@ -1,0 +1,267 @@
+---
+import { site } from '../config/site';
+import { noOrphan } from '../lib/typography';
+
+// Two identical runs, so each tape can loop by sliding half its length.
+const ribbon = Array.from({ length: 12 });
+---
+
+<section class="final">
+  <div class="final__inner container container--padded">
+    <h2 class="final__title t-display" data-reveal="lines">{noOrphan('Your everyday sneaker, refined.')}</h2>
+    <div class="final__action" data-reveal>
+      <button
+        type="button"
+        class="btn btn--primary t-cta"
+        data-add-to-cart
+        data-track="cta-final"
+        data-cue
+        data-id={site.product.id}
+        data-name={site.product.name}
+        data-price={site.product.price}
+        data-image={site.product.image}
+      >
+        <span class="btn__label">Add to bag</span>
+        <span class="btn__done" aria-hidden="true">
+          <img src="/assets/icons/check.svg" alt="" width="16" height="16" />
+          Added
+        </span>
+      </button>
+    </div>
+  </div>
+  <div class="final__stage" aria-hidden="true" data-reveal="image">
+    <img
+      class="final__shoe"
+      src="/assets/images/product-green.avif"
+      srcset="/assets/images/product-green-768.avif 768w, /assets/images/product-green.avif 1206w"
+      sizes="(min-width: 992px) 603px, (min-width: 768px) 512px, (min-width: 480px) 384px, 320px"
+      alt=""
+      width="1206"
+      height="804"
+      loading="lazy"
+      decoding="async"
+    />
+    {
+      ['back', 'front'].map((side) => (
+        <div class={`final__ribbon final__ribbon--${side}`}>
+          <div class="final__ribbon-track">
+            {ribbon.map(() => (
+              <>
+                <span class="final__word t-display">New arrival</span>
+                <img src="/assets/icons/star-green.svg" alt="" width="52" height="52" />
+              </>
+            ))}
+          </div>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<script>
+  // The shoe is armed only when it starts below the fold, so nothing on screen blinks.
+  const shoe = document.querySelector<HTMLElement>('.final__shoe');
+  if (shoe && matchMedia('(prefers-reduced-motion: no-preference)').matches && shoe.getBoundingClientRect().top > innerHeight) {
+    shoe.setAttribute('data-armed', '');
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        io.disconnect();
+        requestAnimationFrame(() => requestAnimationFrame(() => shoe.classList.add('is-in')));
+      },
+      { rootMargin: '0px 0px -20% 0px' },
+    );
+    io.observe(shoe);
+  }
+</script>
+
+<style>
+  /* The shoe drops onto the tapes the first time the section comes into view. */
+  .final__shoe[data-armed] {
+    opacity: 0;
+    transform: translateY(-4rem) rotate(-4deg);
+  }
+
+  .final__shoe[data-armed].is-in {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.5s ease-out,
+      transform 1s cubic-bezier(0.34, 1.45, 0.64, 1);
+  }
+
+  .final__action {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .final {
+    position: relative;
+    overflow: clip;
+    height: 55.375rem;
+  }
+
+  .final__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2.5rem;
+    padding-top: 3.75rem;
+  }
+
+  .final__title {
+    max-width: 40.625rem;
+    text-align: center;
+    color: var(--color-primary);
+  }
+
+  .final__stage {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* In front of both tapes: it rests on them. */
+  .final__shoe {
+    position: absolute;
+    z-index: 1;
+    top: 18.8125rem;
+    left: 50%;
+    width: 37.6875rem;
+    translate: calc(-50% + 0.375rem) 0;
+  }
+
+  .final__ribbon {
+    position: absolute;
+    top: 43.375rem;
+    left: 50%;
+    width: 115.3125rem;
+    translate: -50% -50%;
+    overflow: clip;
+    background-color: var(--color-highlight);
+  }
+
+  .final__ribbon--back {
+    rotate: 8deg;
+  }
+
+  .final__ribbon--front {
+    rotate: -8deg;
+    box-shadow: var(--shadow-ribbon);
+  }
+
+  .final__ribbon-track {
+    --space: 2rem;
+    display: flex;
+    align-items: center;
+    width: max-content;
+    padding-block: 1.5rem;
+    animation: ribbon-left 48s linear infinite;
+  }
+
+  /* A trailing space on every item (not a flex gap) keeps the two runs identical. */
+  .final__ribbon-track > * {
+    margin-right: var(--space);
+  }
+
+  /* The tapes run in opposite directions. */
+  .final__ribbon--back .final__ribbon-track {
+    animation-name: ribbon-right;
+  }
+
+  @keyframes ribbon-left {
+    to {
+      translate: -50% 0;
+    }
+  }
+
+  @keyframes ribbon-right {
+    from {
+      translate: -50% 0;
+    }
+  }
+
+  .final__word {
+    white-space: nowrap;
+    color: var(--color-primary);
+  }
+
+  @media (max-width: 991px) {
+    .final {
+      height: 46rem;
+    }
+
+    .final__shoe {
+      top: 17rem;
+      width: 32rem;
+    }
+
+    .final__ribbon {
+      top: 37rem;
+    }
+
+    .final__ribbon img {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .final {
+      height: 38rem;
+    }
+
+    .final__inner {
+      padding-top: 3rem;
+    }
+
+    .final__shoe {
+      top: 15rem;
+      width: 24rem;
+    }
+
+    .final__ribbon {
+      top: 30rem;
+      width: 75rem;
+    }
+
+    .final__ribbon-track {
+      --space: 1.5rem;
+      padding-block: 1rem;
+      animation-duration: 28s;
+    }
+
+    .final__ribbon img {
+      width: 2.25rem;
+      height: 2.25rem;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .final {
+      height: 33rem;
+    }
+
+    .final__inner {
+      gap: 2rem;
+    }
+
+    .final__shoe {
+      top: 13.5rem;
+      width: 20rem;
+      translate: -50% 0;
+    }
+
+    .final__ribbon {
+      top: 26.5rem;
+      width: 50rem;
+    }
+
+    .final__ribbon img {
+      width: 1.75rem;
+      height: 1.75rem;
+    }
+  }
+</style>

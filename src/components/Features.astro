@@ -1,0 +1,103 @@
+---
+import { noOrphan } from '../lib/typography';
+
+const features = [
+  { icon: '/assets/icons/feature-light.svg', title: 'Lightweight Feel', text: 'A lightweight construction keeps every step feeling easy and unrestricted.' },
+  { icon: '/assets/icons/feature-cushion.svg', title: 'Cushioned Comfort', text: 'Responsive cushioning provides a soft, comfortable feel from your first step to your last.' },
+  { icon: '/assets/icons/feature-flex.svg', title: 'Flexible Movement', text: 'A flexible outsole lets your foot move naturally as you walk, run errands, or stay on the go.' },
+  { icon: '/assets/icons/feature-style.svg', title: 'Everyday Style', text: 'A clean silhouette makes it easy to pair with your favorite everyday looks.' },
+];
+---
+
+<section class="features">
+  <div class="features__inner container container--padded">
+    <div class="features__head">
+      <h2 class="features__title t-display" data-reveal="lines">Made to Move</h2>
+      <p class="features__intro t-body" data-reveal>
+        {noOrphan('Comfort meets everyday versatility in a streamlined design built for wherever the day takes you.')}
+      </p>
+    </div>
+    <ul class="features__grid">
+      {
+        features.map((feature) => (
+          <li class="features__item" data-reveal>
+            <img src={feature.icon} alt="" width="28" height="28" />
+            <h3 class="features__name t-title">{noOrphan(feature.title)}</h3>
+            <p class="t-body">{noOrphan(feature.text)}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .features__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 6.25rem;
+    padding-block: 3.75rem;
+  }
+
+  .features__head {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 30.25rem;
+  }
+
+  .features__title {
+    color: var(--color-primary);
+  }
+
+  .features__intro {
+    max-width: 25.75rem;
+  }
+
+  .features__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 2rem;
+  }
+
+  .features__item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .features__name {
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 991px) {
+    .features__inner {
+      gap: 4rem;
+    }
+
+    .features__head,
+    .features__intro {
+      max-width: none;
+    }
+
+    .features__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 3rem 2rem;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .features__inner {
+      gap: 3rem;
+      padding-block: 3rem;
+    }
+  }
+
+  @media (max-width: 479px) {
+    .features__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+</style>

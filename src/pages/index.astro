@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import TrustBand from '../components/TrustBand.astro';
+import Features from '../components/Features.astro';
+import Details from '../components/Details.astro';
+import Reviews from '../components/Reviews.astro';
+import Faq from '../components/Faq.astro';
+import FinalCta from '../components/FinalCta.astro';
+import Footer from '../components/Footer.astro';
+import StickyBar from '../components/StickyBar.astro';
+
+const faq = [
+  {
+    question: 'How does the shoe fit?',
+    answer: "The shoe fits true to size. We recommend ordering your usual size. If you're between sizes, consider sizing up.",
+  },
+  {
+    question: 'What are the shoes made of?',
+    answer: 'An engineered mesh upper, a lightweight foam midsole and a durable rubber outsole.',
+  },
+  {
+    question: 'Are they suitable for everyday wear?',
+    answer: "Yes. They're made for all-day wear, from errands to the office to weekend plans.",
+  },
+  {
+    question: 'Are the shoes comfortable for long periods?',
+    answer: 'Yes. Responsive cushioning and a lightweight build keep them comfortable from your first step to your last.',
+  },
+  {
+    question: 'How should I clean them?',
+    answer: "Wipe them with a soft cloth and mild soap, then let them air dry. Don't machine wash.",
+  },
+];
+---
+
+<BaseLayout
+  title="Sola Stride | Stride"
+  description="A versatile everyday sneaker designed to keep your feet comfortable, supported, and ready for whatever the day brings."
+>
+  <main id="main-content">
+    <Hero />
+    <TrustBand />
+    <Features />
+    <Details />
+    <Reviews />
+    <Faq title="Questions? We've Got You Covered." items={faq} />
+    <FinalCta />
+  </main>
+  <Footer />
+  <StickyBar />
+</BaseLayout>

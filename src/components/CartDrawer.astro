@@ -1,0 +1,248 @@
+---
+import { site } from '../config/site';
+import { noOrphan } from '../lib/typography';
+---
+
+<dialog class="cart" aria-labelledby="cart-title" data-cart>
+  <div class="cart__head">
+    <h2 id="cart-title" class="t-card">{noOrphan('Your cart')}</h2>
+    <button type="button" class="cart__close" aria-label="Close cart" data-cart-close>
+      <img src="/assets/icons/plus.svg" alt="" width="20" height="20" />
+    </button>
+  </div>
+
+  <ul class="cart__lines" data-cart-lines></ul>
+  <p class="cart__empty t-body" data-cart-empty>{noOrphan('Your cart is empty.')}</p>
+
+  <div class="cart__foot" data-cart-foot hidden>
+    <p class="cart__subtotal">
+      <span class="t-body">Subtotal</span>
+      <span class="t-card" data-cart-subtotal></span>
+    </p>
+    <a class="cart__checkout btn btn--primary t-cta" href={site.checkoutUrl} data-offer data-track="cta-checkout">Checkout</a>
+  </div>
+
+  <template data-cart-line>
+    <li class="cart__line">
+      <img
+        class="cart__thumb"
+        data-line-image
+        src={site.product.image}
+        alt=""
+        width="1206"
+        height="804"
+        loading="lazy"
+        decoding="async"
+      />
+      <div class="cart__info">
+        <p class="cart__name t-small" data-line-name></p>
+        <p class="t-small" data-line-price></p>
+      </div>
+      <div class="cart__qty">
+        <button type="button" class="cart__step" aria-label="Decrease quantity" data-line-step="-1">
+          <img src="/assets/icons/minus.svg" alt="" width="16" height="16" />
+        </button>
+        <span class="cart__count t-body" data-line-qty></span>
+        <button type="button" class="cart__step" aria-label="Increase quantity" data-line-step="1">
+          <img src="/assets/icons/plus.svg" alt="" width="16" height="16" />
+        </button>
+      </div>
+      <button type="button" class="cart__remove t-small" data-line-remove>Remove</button>
+    </li>
+  </template>
+</dialog>
+
+<p class="sr-only" aria-live="polite" data-cart-status></p>
+
+<script>
+  import { startCart } from '../lib/cart';
+
+  startCart();
+</script>
+
+<style>
+  .cart {
+    position: fixed;
+    inset: 0 0 0 auto;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: min(26.5rem, 100%);
+    max-width: none;
+    height: 100dvh;
+    max-height: none;
+    margin: 0;
+    padding: 1.5rem;
+    border: 0;
+    background-color: var(--color-bg-page);
+    color: var(--color-text-primary);
+  }
+
+  .cart[open] {
+    display: flex;
+    animation: cart-in 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cart::backdrop {
+    background-color: var(--color-overlay);
+  }
+
+  @keyframes cart-in {
+    from {
+      translate: 100% 0;
+    }
+  }
+
+  .cart__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cart__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-right: -0.75rem;
+  }
+
+  .cart__close img {
+    rotate: 45deg;
+  }
+
+  .cart__lines {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    overflow-y: auto;
+  }
+
+  .cart__empty {
+    color: var(--color-text-secondary);
+  }
+
+  .cart__empty[hidden] {
+    display: none;
+  }
+
+  .cart__line {
+    display: grid;
+    grid-template-columns: 4rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem;
+    border-radius: var(--radius-panel);
+    background-color: var(--color-bg-panel);
+  }
+
+  .cart__thumb {
+    grid-row: span 2;
+    width: 4rem;
+    height: 4rem;
+    padding: 0.375rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-tile);
+    object-fit: contain;
+  }
+
+  .cart__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .cart__name {
+    color: var(--color-text-primary);
+  }
+
+  .cart__info .t-small:last-child {
+    color: var(--color-text-secondary);
+  }
+
+  .cart__qty {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .cart__count {
+    min-width: 1rem;
+    text-align: center;
+  }
+
+  .cart__step {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-white);
+    cursor: pointer;
+  }
+
+  .cart__remove {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+    align-self: start;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--color-text-secondary);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .cart__foot {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .cart__foot[hidden] {
+    display: none;
+  }
+
+  .cart__subtotal {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+
+  .cart__checkout {
+    width: 100%;
+  }
+
+  @media (max-width: 479px) {
+    .cart {
+      padding: 1.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cart[open] {
+      animation: none;
+    }
+  }
+
+  @media (min-width: 992px) and (hover: hover) and (pointer: fine) {
+    .cart__step,
+    .cart__remove {
+      transition:
+        border-color var(--transition-fast),
+        color var(--transition-fast);
+    }
+
+    .cart__step:hover {
+      border-color: var(--color-text-primary);
+    }
+
+    .cart__remove:hover {
+      color: var(--color-text-primary);
+    }
+  }
+</style>

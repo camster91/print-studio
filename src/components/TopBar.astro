@@ -1,0 +1,195 @@
+---
+import { site } from '../config/site';
+import CartDrawer from './CartDrawer.astro';
+---
+
+<header class="topbar">
+  <a class="topbar__logo t-brand" href="/" aria-label={site.name}>{site.name}</a>
+  <div class="topbar__promo">
+    <p class="t-tag">{site.promo.text}</p>
+    <button class="topbar__copy hit t-tag" type="button" data-code={site.promo.code}>
+      <span class="topbar__copy-label">Copy Code</span>
+      <span class="topbar__copy-done" aria-hidden="true">Copied</span>
+    </button>
+    <span class="sr-only" aria-live="polite" data-copy-status></span>
+  </div>
+  <div class="topbar__icons">
+    <button type="button" class="topbar__icon topbar__cart" aria-label="Cart" aria-haspopup="dialog" data-cart-open>
+      <img src="/assets/icons/cart.svg" alt="" width="24" height="24" />
+      <span class="topbar__count t-tag-sm" data-cart-count hidden>0</span>
+    </button>
+  </div>
+</header>
+
+<CartDrawer />
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.topbar__copy');
+  const status = document.querySelector<HTMLElement>('[data-copy-status]');
+  let timer = 0;
+
+  button?.addEventListener('click', async () => {
+    const code = button.dataset.code ?? '';
+    try {
+      await navigator.clipboard.writeText(code);
+    } catch {
+      const field = document.createElement('textarea');
+      field.value = code;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.append(field);
+      field.select();
+      document.execCommand('copy');
+      field.remove();
+    }
+    button.classList.add('is-copied');
+    if (status) status.textContent = `Code ${code} copied`;
+    clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      button.classList.remove('is-copied');
+      if (status) status.textContent = '';
+    }, 1600);
+  });
+</script>
+
+<style>
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    /* Lines up with the page container on screens wider than it. */
+    padding-block: 0.625rem;
+    padding-inline: max(var(--container-padding), calc((100% - var(--container-max)) / 2 + var(--container-padding)));
+    background-color: var(--color-bg-dark);
+    color: var(--color-accent);
+  }
+
+  .topbar__logo {
+    flex: 1 1 0;
+  }
+
+  .topbar__promo {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+
+  .topbar__promo p {
+    white-space: nowrap;
+  }
+
+  .topbar__copy {
+    display: grid;
+    align-items: center;
+    height: 1.5rem;
+    padding-inline: 0.75rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+    white-space: nowrap;
+    transition: scale 0.35s cubic-bezier(0.22, 1, 0.36, 1), background-color var(--transition-base);
+  }
+
+  .topbar__copy > span {
+    grid-area: 1 / 1;
+    text-align: center;
+    transition: opacity var(--transition-fast);
+  }
+
+  .topbar__copy-done,
+  .topbar__copy.is-copied .topbar__copy-label {
+    opacity: 0;
+  }
+
+  .topbar__copy.is-copied .topbar__copy-done {
+    opacity: 1;
+  }
+
+  .topbar__icons {
+    display: flex;
+    flex: 1 1 0;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .topbar__icon {
+    display: inline-flex;
+  }
+
+  .topbar__cart {
+    position: relative;
+  }
+
+  .topbar__count {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.625rem;
+    display: grid;
+    place-items: center;
+    min-width: 1.125rem;
+    height: 1.125rem;
+    padding-inline: 0.25rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-accent);
+    color: var(--color-primary);
+  }
+
+  .topbar__count[hidden] {
+    display: none;
+  }
+
+  .topbar__count.is-bumped {
+    animation: cart-bump 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes cart-bump {
+    40% {
+      scale: 1.35;
+    }
+  }
+
+  .topbar__logo,
+  .topbar__icon {
+    transition: opacity var(--transition-base);
+  }
+
+  @media (min-width: 992px) and (hover: hover) and (pointer: fine) {
+    .topbar__copy:hover {
+      scale: 0.97;
+      background-color: var(--color-bg-white);
+    }
+
+    .topbar__logo:hover,
+    .topbar__icon:hover {
+      opacity: 0.8;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .topbar {
+      position: relative;
+      justify-content: center;
+      padding-inline: 0.625rem;
+    }
+
+    .topbar__logo,
+    .topbar__icons {
+      display: none;
+    }
+
+    .topbar:has([data-has-items]) {
+      padding-right: 3rem;
+    }
+
+    .topbar__icons:has([data-has-items]) {
+      position: absolute;
+      top: 50%;
+      right: 1rem;
+      display: flex;
+      translate: 0 -50%;
+    }
+  }
+</style>
