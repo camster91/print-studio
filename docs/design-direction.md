@@ -1,6 +1,6 @@
 # Design Direction
 
-**Figma prototype:** https://www.figma.com/design/zgikhuRluw2ekbDlHqkG2H — frames: Home — Desktop 1440, Custom Build Steps 2–5 + Thank you (desktop, stacked in order), Home — Mobile 390, Motion notes, Components (Button, SpecTag, Swatch, PhotoPlaceholder, ProductCard) and colour variables.
+**Figma prototype:** https://www.figma.com/design/zgikhuRluw2ekbDlHqkG2H — see the screen list below.
 
 From Dribbble + real 3D-print sites research (Nov 3, 2026). Base template: Stride (Astro). Motion: GSAP + ScrollTrigger, Lenis, Swiper.
 
@@ -71,3 +71,27 @@ Lenis everywhere, synced to the ScrollTrigger ticker. With reduced motion: no sm
 | Thank you | Request number, 24 h promise, 3 next steps (proof → approve → print) |
 
 Every step shows the dark "Your request" panel with a live estimate that fills in as the visitor goes.
+
+## Shop model (added Nov 3, 2026)
+
+The site sells three ways, shown as badges on every product:
+
+| Badge | Meaning | Checkout |
+| --- | --- | --- |
+| In stock | Printed ahead, on the shelf. Ships in 1–2 days or pickup today. | Pay now (Stripe Checkout) |
+| Made to order | Personalised (name, photo, colour). Proof by email, made in 5–7 days. | Pay now; proof before printing |
+| Custom | Anything else via the custom build form. | Quote first, pay after approval (Stripe invoice / e-Transfer) |
+
+Payments: Astro cart (Stride `src/lib/cart.ts` backend section) → small Cloudflare Worker → Stripe Checkout. No monthly fee; per-sale card fee only. Shopify Basic (~$39 USD/mo) only if the catalogue outgrows this.
+
+## Figma file contents
+
+| Section | Screens |
+| --- | --- |
+| Design system | Components (Button, Chip, Checkbox, Input, Badge, OptionCard, SpecTag, Swatch, PhotoPlaceholder, ProductCard), Foundations sheet (colour variables, 12 text styles, spacing, radii, breakpoints, voice), Motion notes |
+| Desktop — Home | Homepage (12 sections) |
+| Desktop — Custom build flow | Steps 2–5 + Thank you (Step 1 is on the homepage CTA) |
+| Desktop — Shop, product & cart | Lithophane product page, Shop (all products + filters + three ways to buy), Cart drawer |
+| Desktop — Business, about & 404 | For Business (products, steps, bulk pricing, free sample form), About, 404 "Misprint." |
+| Mobile — Pages | Home, Product, Shop, Menu open, Cart |
+| Mobile — Custom build flow | Steps 1–5 + Thank you |
