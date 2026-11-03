@@ -1,6 +1,6 @@
 # 3D Printing Side Business Plan
 
-Business name: **Layerline Studio** (chosen Nov 3, 2026). Check layerline.ca and an Ontario business name search before registering.
+Business name: **Tenth Layer** (chosen Nov 3, 2026; switched from Layerline Studio because layerlinestudio.com is an existing shop). Domains to register: tenthlayer.ca (+ tenthlayer.com). Run an Ontario business name search before registering.
 
 Nov 3, 2026 · Cameron Ashley · Live doc: https://claude.ai/artifact/3HjuqfcLfQRaqNXJ9rFkUQ
 

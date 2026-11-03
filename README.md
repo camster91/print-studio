@@ -1,4 +1,4 @@
-# Layerline Studio
+# Tenth Layer
 
 Home-based 3D printing studio in Toronto: personalized signs, lithophane light boxes,
 QR/NFC stands for local businesses, and battery/tool wall mounts — plus custom builds on request.
