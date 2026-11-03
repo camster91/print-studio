@@ -1,6 +1,6 @@
 # Design Direction
 
-**Figma prototype:** https://www.figma.com/design/zgikhuRluw2ekbDlHqkG2H — frames: Home — Desktop 1440, Custom Build — Desktop 1440, Home — Mobile 390, Motion notes, Components (Button, SpecTag, Swatch, PhotoPlaceholder, ProductCard) and colour variables.
+**Figma prototype:** https://www.figma.com/design/zgikhuRluw2ekbDlHqkG2H — frames: Home — Desktop 1440, Custom Build Steps 2–5 + Thank you (desktop, stacked in order), Home — Mobile 390, Motion notes, Components (Button, SpecTag, Swatch, PhotoPlaceholder, ProductCard) and colour variables.
 
 From Dribbble + real 3D-print sites research (Nov 3, 2026). Base template: Stride (Astro). Motion: GSAP + ScrollTrigger, Lenis, Swiper.
 
@@ -58,3 +58,16 @@ Lenis everywhere, synced to the ScrollTrigger ticker. With reduced motion: no sm
 - 5 steps with progress: (1) What are we making — cards incl. "Something else" · (2) Upload — drop zone, thumbnails, "No file? Describe or sketch it" · (3) Size, colour, quantity — W×H×D mm, preset chips, spool swatches + "Let us choose", stepper with bulk tiers · (4) Budget + deadline — chips, rush +25% · (5) Contact + review — consents
 - Desktop: sticky summary panel with a live "starting from" estimate (labelled estimate; final quote within 24 h)
 - Progress saved in localStorage
+
+## Custom build screens (in Figma)
+
+| Screen | What's on it |
+| --- | --- |
+| Step 1 What | Inline on the homepage CTA: 6 option cards (sign, stand, lithophane, part, organiser, something else) |
+| Step 2 Files | Drop zone (JPG/PNG/HEIC/SVG/PDF/STL/3MF/STEP, 25 MB), upload progress, photo tip, "No file? Describe it", reference link, photo-rights checkbox |
+| Step 3 Size & colour | Size presets + W×H×D, mm/in toggle, spool swatches + "Let us choose", brand hex, material, quantity stepper with bulk tiers |
+| Step 4 Budget & date | Holiday cutoff banner (Dec 4), budget chips, Flexible / By a date / Rush +25%, design help ($0 / from $25), delivery (pickup / Canada / US on request) |
+| Step 5 Contact | Name, email, phone, postal code, preferred contact, review list with Edit links, no-refund + newsletter checkboxes, "Nothing is charged yet" |
+| Thank you | Request number, 24 h promise, 3 next steps (proof → approve → print) |
+
+Every step shows the dark "Your request" panel with a live estimate that fills in as the visitor goes.
