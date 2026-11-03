@@ -1,5 +1,7 @@
 # 3D Printing Side Business Plan
 
+Business name: **Layerline Studio** (chosen Nov 3, 2026). Check layerline.ca and an Ontario business name search before registering.
+
 Nov 3, 2026 · Cameron Ashley · Live doc: https://claude.ai/artifact/3HjuqfcLfQRaqNXJ9rFkUQ
 
 Goal: $70–$100 CAD net profit per month to pay off a Bambu Lab (enclosed, AMS) printer in 12 months.
