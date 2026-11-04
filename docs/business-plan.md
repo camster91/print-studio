@@ -50,7 +50,7 @@ Pricing rule: (filament + parts + packaging) × 3, then add fees and shipping. S
 - **US shipping:** Etsy no longer sells Canada Post labels to the US; US postal shipments owe duty even on CUSMA goods. Sell Canada-only in year one.
 - **LED items:** use only cUL/CSA/cETL-marked USB LED modules. Don't wire mains power.
 - **Trademarks:** "compatible with Milwaukee M18 batteries. Not affiliated with Milwaukee Tool." No brand logos.
-- **HST:** register once all your income (web + prints) passes $30,000 over four quarters.
+- **HST:** confirm the legal entity and existing GST/HST registration before live payment. The small-supplier test concerns taxable revenue, not salary or profit; all sole-proprietor businesses count together where applicable. A single-quarter threshold can also trigger registration.
 - **CCPSA:** keep a 6-year order log. Don't sell anything for kids.
 
 ## Licensing quick table
@@ -78,3 +78,8 @@ Lithophane generators (ItsLitho, Bambu MakerLab, 3dp.rocks) all allow commercial
 3. **Mid-Nov:** walk 10 cafés/salons with a free personalised Google-review stand sample.
 4. **Late Nov–Dec:** one $120–$200 holiday market. Push "order lithophanes by Dec 4".
 5. **January:** keep the top 2 earners per print-hour, drop the weakest, add one runner-up.
+
+
+## Launch decisions, Nov 4
+
+Cameron chose the full catalogue and a separate Layerline Stripe account. Catalogue prices/print hours remain estimates; all products are made to order pending sample checks. Minimum custom quote is now consistently $25. Current QR three-pack code totals $60, pending approval versus the earlier $59 plan. Preparation files are in docs/launch/. No account activation, live payment, market purchase, Etsy/social post or outreach send has been completed by this work.

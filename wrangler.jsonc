@@ -7,16 +7,19 @@
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*"],
+    "run_worker_first": ["/api/*", "/admin", "/admin/*"],
     "not_found_handling": "404-page"
   },
   "workers_dev": true,
+  "observability": { "enabled": true, "head_sampling_rate": 1, "traces": { "enabled": true, "head_sampling_rate": 0.1 } },
   "routes": [
     { "pattern": "layerline.ca", "custom_domain": true },
     { "pattern": "www.layerline.ca", "custom_domain": true }
   ],
   "vars": {
     "FREE_SHIPPING_FROM": "100",
+    "ACCESS_TEAM_DOMAIN": "camster91.cloudflareaccess.com",
+    "ACCESS_AUD": "e712f79f72837962d0adfd88a033b2f5d894f106b515cb44933d9c6adcc7e5f5",
     "SHIPPING_CANADA": "12",
     // New custom/business requests are emailed here (must be a verified Email Routing address).
     "NOTIFY_TO": "cameron@ashbi.ca",

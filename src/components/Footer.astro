@@ -28,8 +28,8 @@ const year = new Date().getFullYear();
         <div class="stack gap-12">
           <p class="mono-s kicker">Contact</p>
           <a href={`mailto:${site.email}`}>{site.email}</a>
-          <a href={site.instagram} rel="noopener">Instagram</a>
-          <a href={site.etsy} rel="noopener">Etsy</a>
+          {site.instagram && <a href={site.instagram} rel="noopener">Instagram</a>}
+          {site.etsy && <a href={site.etsy} rel="noopener">Etsy</a>}
         </div>
       </nav>
     </div>

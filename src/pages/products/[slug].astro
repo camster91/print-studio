@@ -21,11 +21,14 @@ const fields = p.options.fields ?? [];
 const placeholderShots = p.led ? ['Hero, lit', 'Unlit, daylight', 'Detail of layers', 'In hand, for scale', 'In use'] : ['Hero', 'Detail of layers', 'In hand, for scale', 'In use', 'All colours'];
 const shots = p.images?.length ? p.images.map((_, i) => (i === 0 ? 'Hero' : `Photo ${i + 1}`)) : placeholderShots;
 const related = products.filter((x) => x.slug !== p.slug && (x.category === p.category || x.type === p.type)).slice(0, 4);
+const optionImages = { ...(p.optionImages ?? {}) };
+for (const choice of choices) for (const value of choice.values) if (typeof value !== 'string' && value.images?.length) (optionImages[choice.name] ??= {})[value.label] = value.images;
+for (const size of p.options.size ?? []) if (size.images?.length) (optionImages.Size ??= {})[size.label] = size.images;
 const photoCount = p.options.photos ?? 0;
 const needsLogo = p.options.logo;
 const details = [
-  { q: 'Details', a: `${p.material}${p.colours > 1 ? `, ${p.colours} colours` : ''}. About ${p.printHours} hours of printing per piece.${p.fits ? ` Fits ${p.fits}.` : ''}${p.fits || choices.some((c) => c.name === 'Brand' || c.name === 'Device' || c.name === 'Controller') ? ' Brand names only describe what it fits. Not affiliated with or endorsed by any brand.' : ''}${p.led ? ' Includes a certified USB LED and cable; use any USB phone charger.' : ''}${p.credit ? ` ${p.credit}.` : ''}` },
-  { q: 'Timing', a: mto ? `Made to order. We email a proof within 24 hours and print in 5–7 business days after you approve.${site.holidayCutoff ? ` Order by ${site.holidayCutoff} for Christmas.` : ''}` : 'In stock. Ships in 1–2 business days, or pick up in Toronto.' },
+  { q: 'Details', a: `${p.material}${p.colours > 1 ? `, ${p.colours} colours` : ''}. About ${p.printHours} hours of printing per piece.${p.fits ? ` Fits ${p.fits}.` : ''}${p.fits || choices.some((c) => c.name === 'Brand' || c.name === 'Device' || c.name === 'Controller') ? ' Brand names only describe what it fits. Not affiliated with or endorsed by any brand.' : ''}${p.led ? ' USB lighting must use a cUL/CSA/cETL-approved module and matching power supply. Module details are confirmed before production.' : ''}${p.credit ? ` ${p.credit}.` : ''}` },
+  { q: 'Timing', a: mto ? `Made to order. We email a proof within 24 hours and print in 5–7 business days after you approve.` : 'In stock. Ships in 1–2 business days, or pick up in Toronto.' },
   { q: 'Shipping & pickup', a: `Free pickup in Toronto's east end. Canada Post tracked shipping $${site.shippingCanada}, free over $${site.freeShippingFrom}.` },
   { q: 'Care', a: p.material === 'PLA' ? 'Indoor use. Keep out of hot cars and direct sun. Wipe with a dry or damp cloth.' : 'Handles garages and sheds. Wipe clean with a damp cloth.' },
   ...(p.safety ? [{ q: 'Safety', a: p.safety }] : []),
@@ -33,6 +36,7 @@ const details = [
 ---
 
 <BaseLayout title={p.name} description={`${blurbs[p.slug]} ${typeLabel[p.type]} from ${money(startPrice)} CAD. Made in Toronto.`}>
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify({ '@context':'https://schema.org', '@type':'Product', name:p.name, description:blurbs[p.slug], image:(p.images ?? []).map(src => new URL(src,'https://layerline.ca').href), sku:p.slug, brand:{'@type':'Brand',name:'Layerline Studio'}, offers:{'@type':'Offer',url:`https://layerline.ca/products/${p.slug}/`,priceCurrency:'CAD',price:startPrice,seller:{'@type':'Organization',name:'Layerline Studio'},itemCondition:'https://schema.org/NewCondition'} }).replaceAll('<','\u003c')} />
   <div class="container crumbs mono-s"><a href="/shop">Shop</a> / <a href={`/shop?category=${p.category}`}>{audience[p.category].replace('For ', '')}</a> / {p.name}</div>
 
   <section class="container pdp">
@@ -48,9 +52,10 @@ const details = [
     </div>
 
     <form class="buy" data-buy data-slug={p.slug} data-name={p.name} data-type={p.type} data-base={p.price}
-      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0} data-choices={JSON.stringify(choices)}>
+      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0} data-choices={JSON.stringify(choices)} data-option-images={JSON.stringify(optionImages)} data-images={JSON.stringify(p.images ?? [])}>
       <div class="row gap-12 wrap"><span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span><span class="mono-s kicker">{audience[p.category]}</span></div>
       <h1 class="display-l">{p.name}</h1>
+      {!p.productionReady && <p class="note body-s">Sample testing in progress. Images are previews. Live ordering opens after production checks; you can request a quote now.</p>}
       <p class="row gap-12" style="align-items:baseline"><span class="display-m" data-price>{money(startPrice)}</span><span class="body-m">CAD · free Toronto pickup</span></p>
       <p class="body-l">{blurbs[p.slug]}{p.fits && ` Fits ${p.fits}.`}</p>
 
@@ -92,7 +97,7 @@ const details = [
         <div class="field opt"><label for="opt-drawer">Drawer inside size (mm)</label><input id="opt-drawer" class="input" name="Drawer" maxlength="60" required placeholder="e.g. 520 × 380 × 70" /></div>
       )}
       {p.options.link && (
-        <div class="field opt"><label for="opt-link">Where should the QR go?</label><input id="opt-link" class="input" name="Link" maxlength="60" required placeholder="Google review, booking or menu link" /></div>
+        <div class="field opt"><label for="opt-link">Where should the QR go?</label><input id="opt-link" class="input" name="Link" maxlength="500" required placeholder="Google review, booking or menu link" /></div>
       )}
 
       {fields.map((f) => (
@@ -126,8 +131,8 @@ const details = [
         <button class="btn btn--primary buy__add" data-add>Add to bag · <span data-total>{money(startPrice)}</span></button>
       </div>
       {p.bulk && <p class="mono-s kicker">{p.bulk.map((b) => `${b.min}+ ${money(b.price)} each`).join(' · ')}{p.setupFee ? ` · logo setup ${money(p.setupFee)} once` : ''}</p>}
-      {mto && site.holidayCutoff && <p class="note body-s">🎄 Order by {site.holidayCutoff} for Christmas. We email a proof before we print.</p>}
-      <div class="row gap-8 wrap">{(mto ? ['Proof before print', 'Made in 5–7 days'] : ['Ships in 1–2 days', 'Toronto pickup']).concat(p.led ? ['Certified USB LED'] : []).map((t) => <span class="tag">{t}</span>)}</div>
+      {mto && site.holidayCutoff && <p class="note body-s" data-cutoff="2026-12-05T00:00:00-05:00" hidden>Order custom work by {site.holidayCutoff}. We email a proof before we print.</p>}
+      <div class="row gap-8 wrap">{(mto ? ['Proof before print', 'Made in 5–7 days'] : ['Ships in 1–2 days', 'Toronto pickup']).concat(p.led ? ['USB LED · approval check required'] : []).map((t) => <span class="tag">{t}</span>)}</div>
       <p class="body-s buy__error" role="alert" data-error></p>
 
       <div class="acc">
@@ -151,7 +156,7 @@ const details = [
   </section>
 
   <div class="sticky-buy">
-    <div><p class="label-l" data-total-sticky>{money(startPrice)}</p>{mto && site.holidayCutoff && <p class="mono-s kicker">Order by {site.holidayCutoff}</p>}</div>
+    <div><p class="label-l" data-total-sticky>{money(startPrice)}</p>{mto && site.holidayCutoff && <p class="mono-s kicker" data-cutoff="2026-12-05T00:00:00-05:00" hidden>Order by {site.holidayCutoff}</p>}</div>
     <button class="btn btn--primary" data-add-sticky>Add to bag</button>
   </div>
 </BaseLayout>
@@ -161,6 +166,7 @@ const details = [
   import { money } from '../../lib/products';
   import { site } from '../../config/site';
 
+  import {track} from '../../lib/analytics';
   const form = document.querySelector<HTMLFormElement>('[data-buy]')!;
   const d = form.dataset;
   const sizes: { label: string; price: number }[] = JSON.parse(d.sizes!);
@@ -198,7 +204,26 @@ const details = [
     const name = form.querySelector('[data-colour-name]');
     if (colour && name) name.textContent = colour.value;
   };
-  form.addEventListener('change', repaint);
+  const optionImages: Record<string, Record<string, string[]>> = JSON.parse(d.optionImages!);
+  const baseImages: string[] = JSON.parse(d.images!);
+  function swapImage() {
+    const picked = new FormData(form);
+    let image = baseImages[0];
+    for (const [name, values] of Object.entries(optionImages)) {
+      const match = values[String(picked.get(name) ?? '')];
+      if (match?.length) image = match[0];
+    }
+    const img = document.querySelector<HTMLImageElement>('.gallery img');
+    if (img && image) {
+      img.src = image; img.removeAttribute('srcset');
+      img.alt = `${d.name} — ${Object.entries(optionImages).map(([key])=>picked.get(key)).filter(Boolean).join(', ')}`;
+      const note = img.parentElement?.querySelector<HTMLElement>('.photo__note');
+      if (note) note.hidden = !image.startsWith('/renders/');
+      const gallery = document.querySelector('.gallery') as HTMLElement & {swiper?: {slideTo:(index:number)=>void}};
+      gallery?.swiper?.slideTo(0);
+    }
+  }
+  form.addEventListener('change', () => { repaint(); swapImage(); });
   form.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) => b.addEventListener('click', () => { qty = Math.max(1, Math.min(50, qty + Number(b.dataset.q))); repaint(); }));
   form.querySelector<HTMLInputElement>('[data-gift]')?.addEventListener('change', (e) => { (form.querySelector('[data-gift-field]') as HTMLElement).hidden = !(e.target as HTMLInputElement).checked; });
 
@@ -246,7 +271,8 @@ const details = [
   };
   form.addEventListener('submit', add);
   document.querySelector('[data-add-sticky]')!.addEventListener('click', (e) => { form.scrollIntoView({ behavior: 'smooth' }); add(e); });
-  repaint();
+  repaint(); swapImage();
+  track('view_item',{currency:site.currency,value:unit(),items:[{item_id:d.slug,item_name:d.name,price:unit(),quantity:1}]});
 </script>
 
 <style>

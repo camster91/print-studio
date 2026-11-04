@@ -1,0 +1,9 @@
+---
+import { site } from '../config/site';
+---
+<aside class="cutoff"><p>Catalogue preview · Live payments open after sample testing. <a href="/custom">Request a quote</a></p></aside>
+{site.holidayCutoff && <aside class="cutoff" data-cutoff="2026-12-05T00:00:00-05:00" hidden><p>Custom orders: please order by <strong>{site.holidayCutoff}</strong>. Timing is confirmed with your proof. <a href="/custom">Start a request →</a></p></aside>}
+<script>
+  document.querySelectorAll<HTMLElement>('[data-cutoff]').forEach(el => { el.hidden = Date.now() >= Date.parse(el.dataset.cutoff!); });
+</script>
+<style>.cutoff{padding:10px 24px;text-align:center;background:var(--ink);color:var(--paper);font-size:.875rem}.cutoff a{text-decoration:underline;color:inherit}.cutoff[hidden]{display:none}</style>

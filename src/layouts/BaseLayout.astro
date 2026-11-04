@@ -2,6 +2,7 @@
 import { Font } from 'astro:assets';
 import Analytics from '../components/Analytics.astro';
 import Nav from '../components/Nav.astro';
+import CutoffBanner from '../components/CutoffBanner.astro';
 import Footer from '../components/Footer.astro';
 import CartDrawer from '../components/CartDrawer.astro';
 import { site } from '../config/site';
@@ -50,12 +51,15 @@ const ogImageUrl = Astro.site ? new URL(ogImage, Astro.site).href : ogImage;
     <Analytics position="body" />
     <a href="#main-content" class="sr-only">Skip to content</a>
     <Nav />
+    <CutoffBanner />
     <main id="main-content">
       <slot />
     </main>
     <Footer />
     <CartDrawer />
     <script>
+      import { rememberCampaign } from '../lib/analytics';
+      rememberCampaign();
       import { startMotion } from '../lib/motion';
       import { startSwipers } from '../lib/swipers';
       startMotion();

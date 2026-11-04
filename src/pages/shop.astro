@@ -41,6 +41,7 @@ const ways = [
       <div class="row gap-8 wrap" role="group" aria-label="Filter by category">
         {Object.entries(categories).map(([k, v]) => <button class="chip" data-filter="category" data-value={k} aria-pressed="false">{v}</button>)}
       </div>
+      <label class="mono-s">Brand <select class="input" data-brand aria-label="Filter garage brands"><option value="">All brands</option>{[...new Set(products.flatMap(p=>(p.options.choices?.find(c=>c.name==='Brand')?.values ?? []).map(v=>typeof v==='string'?v:v.label)))].map(brand=><option value={brand}>{brand}</option>)}</select></label>
       <p class="mono-s filters__count" aria-live="polite"><span data-count>{products.length}</span> products</p>
     </div>
   </div>
@@ -61,14 +62,14 @@ const ways = [
 
 <script>
   const params = new URLSearchParams(location.search);
-  const state: Record<string, string> = { type: params.get('type') ?? '', category: params.get('category') ?? '' };
+  const state: Record<string, string> = { type: params.get('type') ?? '', category: params.get('category') ?? '', brand: params.get('brand') ?? '' };
   const cards = [...document.querySelectorAll<HTMLElement>('[data-grid] > .card')];
   const count = document.querySelector('[data-count]')!;
   const empty = document.querySelector<HTMLElement>('[data-empty]')!;
   function apply() {
     let n = 0;
     cards.forEach((c) => {
-      const show = (!state.type || c.dataset.type === state.type) && (!state.category || c.dataset.category === state.category);
+      const show = (!state.type || c.dataset.type === state.type) && (!state.category || c.dataset.category === state.category) && (!state.brand || c.dataset.brands?.split('|').includes(state.brand));
       c.hidden = !show;
       if (show) n++;
     });
@@ -85,6 +86,7 @@ const ways = [
       apply();
     }),
   );
+  const brand=document.querySelector<HTMLSelectElement>('[data-brand]')!; brand.value=state.brand;brand.addEventListener('change',()=>{state.brand=brand.value;apply();});
   apply();
 </script>
 

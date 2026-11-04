@@ -56,3 +56,17 @@ test('choices set or add to the price, and are checked', () => {
   assert.equal(l.options['Second line'].length, 30);
   assert.equal(l.options.Style, 'Wedge');
 });
+
+test('long QR links stay complete and traversal or malformed files are rejected',()=>{
+  const link='https://example.test/'+ 'x'.repeat(300);
+  const line=priceLine(products,{slug:'qr-review-stand',quantity:1,options:{Link:link},files:['uploads/../private.json']});
+  assert.equal(line.options.Link,link);assert.deepEqual(line.files,[]);
+  assert.throws(()=>priceLine(products,{slug:'qr-review-stand',quantity:1,files:'bad' as never}),/Invalid files/);
+});
+
+import {cartDisplayPrice} from '../src/lib/cart-pricing.ts';
+test('bag display reprices bulk quantities and keeps setup charged once',()=>{
+  assert.equal(cartDisplayPrice(products,{slug:'qr-review-stand',quantity:3,options:{Link:'https://example.test'},files:['uploads/2026-11/logo.png']}),25);
+  assert.equal(cartDisplayPrice(products,{slug:'qr-review-stand',quantity:1,options:{Link:'https://example.test'},files:['uploads/2026-11/logo.png']}),40);
+  assert.equal(cartDisplayPrice(products,{slug:'desk-nameplate',quantity:10,options:{Text:'Cam'}}),22);
+});

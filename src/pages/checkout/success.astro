@@ -6,9 +6,9 @@ import { site } from '../../config/site';
 <BaseLayout title="Order confirmed" noindex>
   <section class="container done">
     <div class="done__tick" aria-hidden="true">✓</div>
-    <p class="mono-m kicker">Payment received</p>
-    <h1 class="display-xl">Thank you. It's on the build plate.</h1>
-    <p class="body-l">Stripe has emailed your receipt. Made-to-order items get a proof by email within 24 hours. In-stock items ship in 1–2 business days, or we'll email you when your pickup is ready.</p>
+    <p class="mono-m kicker" data-payment-state>Checking payment…</p>
+    <h1 class="display-xl" data-payment-title>Checking your order.</h1>
+    <p class="body-l" data-payment-message>Please wait while we confirm payment with Stripe. Your bag stays saved until payment is confirmed.</p>
     <p class="body-m">Questions? Email <a href={`mailto:${site.email}`} style="text-decoration:underline">{site.email}</a>.</p>
     <a href="/shop" class="btn btn--dark">Back to the shop</a>
   </section>
@@ -16,7 +16,20 @@ import { site } from '../../config/site';
 
 <script>
   import { clearCart } from '../../lib/cart';
-  clearCart();
+  import {track} from '../../lib/analytics';
+  const id=new URLSearchParams(location.search).get('session_id');
+  const message=document.querySelector('[data-payment-message]')!;
+  if(id) {
+    try {
+      const res=await fetch(`/api/order-status?session_id=${encodeURIComponent(id)}`);const data=await res.json();
+      if(!res.ok || !data.paid)throw new Error('Payment not confirmed yet. Check your Stripe receipt or contact us; do not pay again.');
+      document.querySelector('[data-payment-state]')!.textContent=data.live?'Payment received':'Test payment received';
+      document.querySelector('[data-payment-title]')!.textContent=data.live?'Thank you. Order received.':'Test complete. No print order placed.';
+      message.textContent=data.live?'We will email your next steps. Personalised work gets a proof before printing.':'This used Stripe test mode. No real money was charged.';
+      clearCart();
+      if(data.live && !sessionStorage.getItem(`purchase:${id}`)){track('purchase',{transaction_id:data.transaction_id,value:data.value,currency:'CAD'});sessionStorage.setItem(`purchase:${id}`,'1');}
+    }catch(e){message.textContent=(e as Error).message;document.querySelector('[data-payment-state]')!.textContent='Payment not confirmed';}
+  }else{message.textContent='No order reference was supplied. Please check your receipt or contact us.';document.querySelector('[data-payment-state]')!.textContent='No order reference';}
 </script>
 
 <style>

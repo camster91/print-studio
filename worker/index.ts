@@ -11,16 +11,19 @@
  *   SEND_EMAIL         optional Email Routing binding; NOTIFY_TO = your verified address
  */
 import data from '../src/data/products.json';
+import { stripeWebhook, orderStatus } from './stripe';
+import { adminApi, authoriseAdmin } from './admin';
 import { priceLine, subtotal, type PricedLine } from '../src/lib/pricing';
 import type { Product } from '../src/lib/products';
 
-interface R2Bucket {
-  put(key: string, value: ArrayBuffer | string, opts?: { httpMetadata?: { contentType?: string }; customMetadata?: Record<string, string> }): Promise<unknown>;
-}
 interface SendEmail { send(message: unknown): Promise<void> }
 export interface Env {
   ASSETS: { fetch(req: Request): Promise<Response> };
   STRIPE_SECRET_KEY?: string;
+  STRIPE_WEBHOOK_SECRET?: string;
+  ACCESS_TEAM_DOMAIN?: string;
+  ACCESS_AUD?: string;
+  TAX_READY?: string;
   UPLOADS?: R2Bucket;
   SEND_EMAIL?: SendEmail;
   NOTIFY_TO?: string;
@@ -40,7 +43,16 @@ const json = (body: unknown, status = 200) =>
 export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const url = new URL(req.url);
+    if (url.pathname === '/admin' || url.pathname.startsWith('/admin/')) {
+      if (!await authoriseAdmin(req, env)) return json({ error: 'Private area. Sign in through Cloudflare Access.' }, 403);
+      return env.ASSETS.fetch(req);
+    }
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(req);
+    try {
+      if (url.pathname === '/api/stripe-webhook' && req.method === 'POST') return await stripeWebhook(req, env);
+      if (url.pathname.startsWith('/api/admin/')) return await adminApi(req, env, url);
+      if (url.pathname === '/api/order-status' && req.method === 'GET') return await orderStatus(url, env);
+    } catch (e) { console.error('Private API or payment processing failed'); return json({ error: 'Please retry shortly.' }, 500); }
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
     // Same-origin only (blocks other sites posting to these endpoints).
     const origin = req.headers.get('origin');
@@ -65,6 +77,7 @@ export function buildCheckoutParams(lines: PricedLine[], origin: string, env: Pi
   const p = new URLSearchParams();
   const cents = (n: number) => String(Math.round(n * 100));
   p.set('mode', 'payment');
+  p.set('payment_method_types[0]', 'card');
   p.set('success_url', `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`);
   p.set('cancel_url', `${origin}/shop?checkout=cancelled`);
   p.set('allow_promotion_codes', 'true');
@@ -117,6 +130,8 @@ export function buildCheckoutParams(lines: PricedLine[], origin: string, env: Pi
 }
 
 async function checkout(req: Request, env: Env, url: URL) {
+  if (env.STRIPE_SECRET_KEY?.startsWith('sk_live_') && env.TAX_READY !== 'true') return json({ error: 'Live checkout is awaiting the studio’s tax setup. Please request a quote.' }, 503);
+  if (!env.UPLOADS) return json({ error: 'Order records are not available. Please try later.' }, 503);
   if (!env.STRIPE_SECRET_KEY) return json({ error: 'Checkout isn’t switched on yet. Please email us to order.' }, 503);
   const body = (await req.json().catch(() => null)) as { items?: unknown[]; attribution?: Record<string, string> } | null;
   if (!body?.items?.length) throw new UserError('Your bag is empty.');
@@ -124,8 +139,15 @@ async function checkout(req: Request, env: Env, url: URL) {
   const lines = body.items.map((it) => {
     try { return priceLine(products, it as Parameters<typeof priceLine>[1]); } catch (e) { throw new UserError((e as Error).message); }
   });
+  if (env.STRIPE_SECRET_KEY.startsWith('sk_live_') && lines.some(l=>!l.product.productionReady)) return json({ error: 'This product is still in sample testing. Please request a quote.' }, 409);
   const attribution = Object.fromEntries(Object.entries(body.attribution ?? {}).filter(([k]) => /^(utm_\w+|fbclid|gclid|ttclid)$/.test(k)));
   const params = buildCheckoutParams(lines, url.origin, env, attribution);
+  const id = `LL-${crypto.randomUUID()}`;
+  await env.UPLOADS.put(`pending/${id}.json`, JSON.stringify({ id, createdAt: new Date().toISOString(), attribution, lines: lines.map(l => ({ slug: l.product.slug, name: l.product.name, quantity: l.quantity, unit: l.unit, setup: l.setup, options: l.options, files: l.files, estimatedMaterialCost: l.product.materialCost, printHours: l.product.printHours })) }));
+  params.set('metadata[source]', 'layerline');
+  params.set('metadata[order_id]', id);
+  // Live tax setup is confirmed separately before TAX_READY is enabled.
+  if (env.STRIPE_SECRET_KEY.startsWith('sk_live_')) params.set('automatic_tax[enabled]', 'true');
   const res = await fetch('https://api.stripe.com/v1/checkout/sessions', {
     method: 'POST',
     headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}`, 'content-type': 'application/x-www-form-urlencoded' },
@@ -133,7 +155,7 @@ async function checkout(req: Request, env: Env, url: URL) {
   });
   const session = (await res.json()) as { url?: string; error?: { message?: string } };
   if (!res.ok || !session.url) {
-    console.error('Stripe error', session.error?.message);
+    console.error('Stripe checkout failed');
     return json({ error: 'Checkout couldn’t start. Please try again in a minute.' }, 502);
   }
   return json({ url: session.url });
@@ -145,7 +167,7 @@ function safeName(name: string) {
 }
 function checkFile(f: File) {
   if (f.size > MAX_FILE) throw new UserError(`${f.name} is over 25 MB.`);
-  if (!OK_EXT.test(f.name) && !OK_TYPES.test(f.type)) throw new UserError(`${f.name} isn’t a supported file type.`);
+  if (!OK_EXT.test(f.name) || (f.type && !OK_TYPES.test(f.type))) throw new UserError(`${f.name} isn’t a supported file type.`);
 }
 async function upload(req: Request, env: Env) {
   if (!env.UPLOADS) return json({ error: 'Uploads aren’t set up yet.' }, 503);
@@ -161,9 +183,7 @@ async function upload(req: Request, env: Env) {
 
 /* ---------- Quote requests ---------- */
 export function requestId(now = Date.now()) {
-  const t = now.toString(36).toUpperCase().slice(-4);
-  const r = Math.floor(Math.random() * 36 ** 2).toString(36).toUpperCase().padStart(2, '0');
-  return `LL-${t}${r}`;
+  return `LL-${crypto.randomUUID()}`;
 }
 
 async function quote(req: Request, env: Env) {
@@ -189,7 +209,7 @@ async function quote(req: Request, env: Env) {
   const saved: string[] = [];
   if (env.UPLOADS) {
     for (const f of files) {
-      const key = `requests/${id}/${safeName(f.name)}`;
+      const key = `request-files/${id}/${crypto.randomUUID()}-${safeName(f.name)}`;
       await env.UPLOADS.put(key, await f.arrayBuffer(), { httpMetadata: { contentType: f.type || 'application/octet-stream' } });
       saved.push(key);
     }

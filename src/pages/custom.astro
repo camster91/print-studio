@@ -85,7 +85,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 
       <!-- 4 -->
       <fieldset class="step" data-step-panel="3" hidden>
-        {site.holidayCutoff && <p class="banner label-m">Holidays: order custom gifts by {site.holidayCutoff} to get them before Christmas.</p>}
+        {site.holidayCutoff && <p class="banner label-m" data-cutoff="2026-12-05T00:00:00-05:00" hidden>Order custom work by {site.holidayCutoff}. We confirm delivery timing with your proof.</p>}
         <legend class="label-l">Budget</legend>
         <p class="body-s">Helps us suggest the right size and finish. You still get an exact quote.</p>
         <div class="row gap-8 wrap">{budgets.map((b, i) => <label class="chip"><input type="radio" name="budget" value={b} checked={i === 2} />{b}</label>)}</div>
@@ -103,7 +103,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
         </div>
         <span class="label-l" style="margin-top:12px">Delivery</span>
         <div class="opts opts--3">
-          {[['Toronto pickup', 'Free', 'Porch pickup, east end.'], ['Ship in Canada', `$${site.shippingCanada}`, 'Canada Post, tracked.'], ['United States', 'Ask', 'On request, duties included in the quote.']].map(([t, e, d], i) => (
+          {[['Toronto pickup', 'Free', 'Porch pickup, east end.'], ['Ship in Canada', `$${site.shippingCanada}`, 'Canada Post, tracked.']].map(([t, e, d], i) => (
             <label class="option"><input type="radio" name="delivery" value={t} checked={i === 0} /><span class="option__top"><span class="label-l">{t}</span><span class="mono-s">{e}</span></span><span class="body-s">{d}</span></label>
           ))}
         </div>
@@ -205,7 +205,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
     if (val('design') === 'Design it for me') lo += 25;
     if (val('timing') === 'Rush') lo *= 1.25;
     const disc = q >= 10 ? 0.85 : q >= 5 ? 0.9 : 1;
-    const total = Math.max(lo * q * disc, 15);
+    const total = Math.max(lo * q * disc, site.minimumCustomJob);
     const hi = total * 1.2;
     return q > 1 || lo !== from ? `$${Math.round(total)} – $${Math.round(hi)}` : `From $${from}`;
   }

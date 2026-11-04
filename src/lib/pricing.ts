@@ -57,6 +57,8 @@ export function priceLine(products: Product[], input: LineInput): PricedLine {
   const quantity = Math.floor(Number(input.quantity));
   if (!Number.isFinite(quantity) || quantity < 1 || quantity > MAX_QTY) throw new Error(`Quantity for ${product.name} must be 1–${MAX_QTY}.`);
 
+  if (input.options && (typeof input.options !== 'object' || Array.isArray(input.options))) throw new Error('Invalid options.');
+  if (input.files && !Array.isArray(input.files)) throw new Error('Invalid files.');
   const raw = input.options ?? {};
   const options: Record<string, string> = {};
   const allowed: Record<string, string[] | 'text'> = {};
@@ -68,7 +70,7 @@ export function priceLine(products: Product[], input: LineInput): PricedLine {
   if (product.options.place) allowed.Place = 'text';
   if (product.options.drawer) allowed.Drawer = 'text';
   for (const c of product.options.choices ?? []) allowed[c.name] = c.values.map(valueLabel);
-  const maxLen: Record<string, number> = { 'Gift note': 200 };
+  const maxLen: Record<string, number> = { 'Gift note': 200, Link: 500 };
   for (const f of product.options.fields ?? []) { allowed[f.name] = 'text'; if (f.max) maxLen[f.name] = f.max; }
   allowed['Gift note'] = 'text';
   for (const a of product.addOns ?? []) allowed[a.label] = ['Yes', 'No'];
@@ -87,7 +89,7 @@ export function priceLine(products: Product[], input: LineInput): PricedLine {
   for (const f of product.options.fields ?? []) if (f.required && !options[f.name]) throw new Error(`Please add the ${f.label.toLowerCase()} for your ${product.name}.`);
   if (product.type === 'made-to-order' && product.options.text && !options.Text) throw new Error(`Please add the text for your ${product.name}.`);
 
-  const files = (input.files ?? []).filter((f) => typeof f === 'string' && /^uploads\/[\w\-./]+$/.test(f)).slice(0, 10);
+  const files = (input.files ?? []).filter((f) => typeof f === 'string' && /^uploads\/[\w\-./]+$/.test(f) && !f.includes('..')).slice(0, 10);
   const unit = unitPrice(product, options, quantity);
   const setup = product.setupFee && files.length ? product.setupFee : 0;
   const description = [

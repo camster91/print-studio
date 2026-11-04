@@ -55,7 +55,7 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
           <div class="swiper-wrapper">
             {heroSlides.map((s, i) => (
               <div class="swiper-slide hero__slide">
-                <img src={s.src} alt={s.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+                <img src={s.src} srcset={`${s.src.replace('/renders/','/renders/responsive/').replace('.webp','-480.webp')} 480w, ${s.src.replace('/renders/','/renders/responsive/').replace('.webp','-800.webp')} 800w, ${s.src} 1024w`} sizes="(max-width: 767px) 90vw, 50vw" width="1024" height="1024" alt={s.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
                 <a href={`/products/${s.p.slug}`} class="hero__product">
                   <span class="stack"><span class="label-m">{s.p.name}</span><span class="mono-s hero__price">{priceLabel(s.p)}</span></span>
                   <span class="hero__go" aria-hidden="true">→</span>

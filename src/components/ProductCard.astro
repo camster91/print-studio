@@ -6,7 +6,7 @@ interface Props { product: Product; class?: string; showSpec?: boolean }
 const { product: p, class: cls = '', showSpec = true } = Astro.props;
 ---
 
-<a href={`/products/${p.slug}`} class:list={['card', cls]} data-category={p.category} data-type={p.type}>
+<a href={`/products/${p.slug}`} class:list={['card', cls]} data-category={p.category} data-type={p.type} data-brands={(p.options.choices?.find(c=>c.name==='Brand')?.values ?? []).map(v=>typeof v==='string'?v:v.label).join('|')}>
   <Photo caption={p.name} src={p.images?.[0]} tone={p.led ? 'warm' : 'default'} />
   <div class="card__body">
     <span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span>

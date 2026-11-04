@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+<BaseLayout title="Studio admin" noindex>
+<section class="container section admin">
+  <h1 class="display-m">Studio desk</h1>
+  <p>Private. Figures are CAD. Test orders never count towards profit.</p>
+  <label>Month <input type="month" id="month" class="input" /></label>
+  <div class="row wrap gap-12"><button class="btn btn--dark" data-kind="requests">Requests</button><button class="btn btn--dark" data-kind="orders">Paid orders</button><button class="btn btn--dark" data-kind="test-orders">Test orders</button><a id="export" class="btn" href="/api/admin/export">Download sales CSV</a></div>
+  <p id="message" role="status"></p><div id="records" class="stack gap-16"></div><button id="more" class="btn" hidden>Load more</button>
+  <h2 class="display-s">Monthly costs</h2>
+  <p>Enter actual spend, postage paid and refunds for this month. Add missing Stripe fees below. Tax collected is excluded from profit. Review refunds and later fee changes against Stripe each month.</p>
+  <form id="costs" class="stack gap-12">
+    {['filament', 'led', 'packaging', 'postage', 'other', 'refunds', 'feeAdjustment'].map(f => <label>{f}<input class="input" type="number" min="0" max="100000" step="0.01" name={f} value="0" required /></label>)}
+    <button class="btn btn--primary">Save month’s costs</button>
+  </form>
+  <output id="profit"></output>
+  <h2 class="display-s">Quick quote</h2>
+  <form id="calculator" class="stack gap-12"><label>Print hours<input class="input" name="hours" type="number" min="0" step="0.1" value="1" /></label><label>Filament grams<input class="input" name="grams" type="number" min="0" value="50" /></label><label>Parts, packaging and design fee (CAD)<input class="input" name="extras" type="number" min="0" step="0.01" value="0" /></label><label class="check"><input name="rush" type="checkbox" />Rush +25%</label></form>
+  <output id="quote"></output>
+  <p>Estimate uses $4/hour + $0.08/gram + extras, $25 minimum. Charge in full under $60; otherwise 50% deposit. Send the quote and proof for approval before creating a Stripe invoice.</p>
+</section>
+</BaseLayout>
+<script>
+const month = document.querySelector<HTMLInputElement>('#month')!;
+month.value = new Date().toLocaleDateString('en-CA', {timeZone:'America/Toronto'}).slice(0,7);
+const message = document.querySelector('#message')!;
+const records = document.querySelector('#records')!;
+const more = document.querySelector<HTMLButtonElement>('#more')!;
+let kind = 'requests'; let cursor: string | null = null;
+async function api(path: string, options?: RequestInit) { const r = await fetch(`/api/admin/${path}`,options); const b = await r.json(); if (!r.ok) throw new Error(b.error); return b; }
+const text = (tag: string, content: string) => { const el = document.createElement(tag); el.textContent = content; return el; };
+async function load(append = false) {
+  try {
+    const b = await api(`list?kind=${kind}&month=${month.value}${append && cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`);
+    if (!append) records.replaceChildren();
+    for (const record of b.records) {
+      const box = document.createElement('article'); box.className = 'record';
+      box.append(text('h2', `${record.id} · ${record.status}`),text('p',record.paidAt ?? record.receivedAt ?? ''));
+      const pre = text('pre', JSON.stringify(record.fields ?? record.lines,null,2)); box.append(pre);
+      const download = document.createElement('a'); download.href = `/api/admin/file?key=${encodeURIComponent(record.key)}`; download.textContent = 'Download full record'; box.append(download);
+      const files: string[] = record.files ?? record.lines?.flatMap((l: {files: string[]})=>l.files) ?? [];
+      for (const key of files) { const a=document.createElement('a');a.href=`/api/admin/file?key=${encodeURIComponent(key)}`;a.textContent=key;box.append(a); }
+      if (kind === 'requests') {
+        const label = text('label','Production status '); const select = document.createElement('select'); select.setAttribute('aria-label',`Status for ${record.id}`);
+        for (const v of ['new','quoted','approved','printing','done']) { const opt = new Option(v,v);opt.selected = v === record.status;select.add(opt); }
+        select.addEventListener('change',async()=>{try {await api('status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:record.id,status:select.value})});message.textContent='Status saved.';}catch(e){message.textContent=String(e);}});label.append(select);box.append(label);
+      }
+      records.append(box);
+    }
+    cursor=b.cursor;more.hidden=!cursor;message.textContent=b.records.length ? 'Loaded.' : 'No records in this view.';
+    await profit();
+  } catch(e) { message.textContent=String(e); }
+}
+async function profit() { const b=await api(`profit?month=${month.value}`);document.querySelector('#profit')!.textContent=`Provisional net: $${b.net.toFixed(2)} · Sales excluding tax: $${b.sales.toFixed(2)} · Known Stripe fees: $${b.stripeFees.toFixed(2)} · ${b.missingFeeCount} orders need fee checks. ${b.costsRecorded ? '' : 'Costs have not been entered.'}`;for(const [key,value] of Object.entries(b.costs)){const input=document.querySelector<HTMLInputElement>(`#costs [name="${key}"]`);if(input)input.value=String(Number(value)/100);}document.querySelector<HTMLAnchorElement>('#export')!.href=`/api/admin/export?month=${month.value}`; }
+document.querySelectorAll<HTMLButtonElement>('[data-kind]').forEach(b=>b.addEventListener('click',()=>{kind=b.dataset.kind!;load();}));
+month.addEventListener('change',()=>load()); more.addEventListener('click',()=>load(true));
+document.querySelector<HTMLFormElement>('#costs')!.addEventListener('submit',async(e)=>{e.preventDefault();try{await api(`expense?month=${month.value}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(Object.fromEntries(new FormData(e.currentTarget as HTMLFormElement)))});await profit();message.textContent='Costs saved.';}catch(e){message.textContent=String(e);}});
+const calculator=document.querySelector<HTMLFormElement>('#calculator')!;
+function calculate(){const d=new FormData(calculator);const amount=Math.max(25,Number(d.get('hours'))*4+Number(d.get('grams'))*.08+Number(d.get('extras')))*(d.has('rush')?1.25:1);document.querySelector('#quote')!.textContent=`Quote $${amount.toFixed(2)} CAD · Deposit $${(amount<60?amount:amount/2).toFixed(2)} CAD, before applicable tax.`;}
+calculator.addEventListener('input',calculate);calculate();load();
+</script>
+<style>.admin {display:flex;flex-direction:column;gap:24px;max-width:1000px}.admin :global(.record){display:flex;flex-direction:column;gap:12px;padding:24px;background:white;border-radius:16px;min-width:0}.admin :global(pre){white-space:pre-wrap;overflow-wrap:anywhere}.admin :global(a){text-decoration:underline;overflow-wrap:anywhere}.admin input{max-width:320px;display:block}.admin h2{margin-top:24px}</style>

@@ -4,8 +4,8 @@ export const site = {
   shortName: 'Layerline',
   tagline: 'Printed in Toronto',
   email: 'hello@layerline.ca',
-  instagram: 'https://instagram.com/',
-  etsy: 'https://www.etsy.com/',
+  instagram: '',
+  etsy: '',
   currency: 'CAD',
   locale: 'en-CA',
   /** Holiday cutoff shown in banners. Set to '' to hide. */
@@ -13,7 +13,7 @@ export const site = {
   /** Free shipping in Canada at or above this subtotal (CAD). */
   freeShippingFrom: 100,
   shippingCanada: 12,
-  minimumCustomJob: 15,
+  minimumCustomJob: 25,
   /** Worker endpoints (same origin). */
   api: {
     checkout: '/api/checkout',

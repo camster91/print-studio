@@ -8,7 +8,7 @@ export default defineConfig({
   site: SITE,
   output: 'static',
   compressHTML: true,
-  integrations: [sitemap({ filter: (page) => !page.includes('/checkout/') })],
+  integrations: [sitemap({ filter: (page) => !page.includes('/checkout/') && !page.includes('/admin') })],
   build: { inlineStylesheets: 'auto' },
   fonts: [
     {

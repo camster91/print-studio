@@ -52,7 +52,10 @@ Thumbs.db
 !/package.json
 !/package-lock.json
 !/tsconfig.json
-/scripts/
+/scripts/*
+!/scripts/prepare-launch.py
+!/scripts/make-outreach-card.py
 
 # wrangler local secrets
 .dev.vars
+.dev.vars.*

@@ -66,13 +66,27 @@ Uploads and quote requests are stored in a local R2 simulation while developing.
 - **Photos:** `public/renders/` holds AI preview images (made with Higgsfield). They show a small "Preview image"
   tag. Replace them with real photos in `public/products/<slug>/` and update `images` in `products.json`.
 
+### Launch work (Nov 4)
+
+The full 17-product catalogue remains visible as sample-testing previews. Cameron chose a **separate Layerline Stripe account**; it must be created/activated by him before live keys are connected. Live checkout requires `TAX_READY=true` after tax setup and `productionReady: true` on each verified product. All products remain made to order until actual stock is known. Do not enable these flags just to make checkout pass.
+
+- `docs/launch/cameron-checklist.md`: exact physical/account decisions.
+- `docs/launch/`: pricing/sample/outreach CSVs, eight Etsy drafts, social plan, shipping plan, quote/proof/review emails, SEO steps and market/promo brief. Draft communications require Cameron's approval.
+- `output/pdf/layerline-counter-card.pdf`: two-up letter-size draft card, approve prices before distribution.
+- `models/`: original parametric CAD + rendered prototype STLs, awaiting physical testing.
+- `/admin/`: Cloudflare Access + verified JWT, Cameron only. Request statuses, protected file downloads, monthly sales CSV, actual-cost entry, provisional net and quote calculator. API also validates JWT; workers.dev cannot bypass it.
+- `POST /api/stripe-webhook`: raw Stripe signature verification; only paid source=layerline sessions; full R2 print record; test/live logs isolated; retried mail on failure. Set `STRIPE_WEBHOOK_SECRET` only as a Worker secret. Register the two Checkout completion events in test, then in the new live account.
+- Webhook is at-least-once: an extremely rare crash after email delivery but before saving its marker can send a duplicate. One R2 record per session and conditional email lock avoid normal duplicates. Stale locks expire after one day. Reconcile against Stripe; do not auto-print twice.
+- Privacy lifecycle: artwork uploads, request-files, requests and unpaid snapshots expire after 90 days. Paid order records have no lifecycle expiry and must be retained at least six years. Never add a whole-bucket expiry.
+- Refunds/postage/parts and missing fees are entered in admin for monthly profit; figures remain provisional until reconciled. Custom invoices are reviewed/sent from Stripe, not automatically charged from admin.
+
 ### How an order flows
 
 1. Bag lives in the browser (`localStorage`).
 2. Checkout posts the bag to `/api/checkout`. The Worker re-prices every line from `products.json`, validates
    options, and creates a Stripe Checkout Session (CAD, Canada shipping or free Toronto pickup, phone number,
    promo codes). Personalisation and uploaded file keys go in the Stripe line description + metadata.
-3. Stripe emails the receipt; you see the order and its options in the Stripe dashboard.
+3. The verified paid webhook saves the complete print record and emails the studio. Stripe receipt email must be enabled separately in the selected account. The success page confirms the paid session before clearing the bag.
 4. Uploaded photos/logos are in R2 at the keys shown in the order metadata.
 
 ### Custom quotes

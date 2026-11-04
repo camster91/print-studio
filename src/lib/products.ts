@@ -2,15 +2,16 @@ import data from '../data/products.json';
 import { site } from '../config/site';
 
 export type ProductType = 'in-stock' | 'made-to-order';
-export type SizeOption = { label: string; price: number };
+export type SizeOption = { label: string; price: number; images?: string[] };
 /** A choice value: plain label, or a label that sets the price (`price`) or adds to it (`add`). */
-export type ChoiceValue = string | { label: string; price?: number; add?: number };
+export type ChoiceValue = string | { label: string; price?: number; add?: number; images?: string[] };
 export type Choice = { name: string; values: ChoiceValue[] };
 export type Field = { name: string; label: string; placeholder?: string; max?: number; required?: boolean };
 export { valueLabel, valuePrice, valueAdd, defaultValue } from './pricing';
 import { valuePrice } from './pricing';
 export type Product = {
   slug: string;
+  productionReady?: boolean;
   name: string;
   fits?: string;
   type: ProductType;
@@ -28,6 +29,7 @@ export type Product = {
   safety?: string;
   credit?: string;
   images?: string[];
+  optionImages?: Record<string, Record<string, string[]>>;
   options: {
     colour?: string[];
     frameColour?: string[];
@@ -83,7 +85,7 @@ export const blurbs: Record<string, string> = {
   'led-name-sign': 'Your name or channel, lit. USB powered.',
   'personalised-headphone-stand': 'A desk stand with your name on it.',
   'desk-nameplate': 'Two-colour wedge with your name and title.',
-  'nursery-wall-name-sign': 'Chunky letters for a nursery wall.',
+  'wall-name-sign': 'Raised lettering for your studio, office or home wall.',
   'qr-review-stand': 'Your logo plus a Google review or payment QR.',
   'cottage-lake-topo-map': 'Your lake or cottage area in 3D layers.',
   'gridfinity-drawer-kit': 'Bins and baseplate cut to fit your drawer.',

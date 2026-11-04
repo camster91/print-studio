@@ -53,7 +53,7 @@ import { site } from '../config/site';
 <script>
   import { site } from '../config/site';
   import { getCart, setQuantity, checkout, type CartItem } from '../lib/cart';
-  import { money } from '../lib/products';
+  import { money, bySlug } from '../lib/products';
 
   const drawer = document.querySelector<HTMLDialogElement>('[data-cart]')!;
   const lines = drawer.querySelector<HTMLElement>('[data-cart-lines]')!;
@@ -77,6 +77,10 @@ import { site } from '../config/site';
     (drawer.querySelector('[data-ship-bar]') as HTMLElement).style.width = `${Math.min(100, (subtotal / site.freeShippingFrom) * 100)}%`;
     lines.replaceChildren(...items.map((item) => {
       const row = tpl.content.firstElementChild!.cloneNode(true) as HTMLElement;
+      const product = bySlug(item.slug);
+      let src = product?.images?.[0];
+      for (const [name, values] of Object.entries(product?.optionImages ?? {})) if (values[item.options[name]]?.[0]) src = values[item.options[name]][0];
+      if (src) { const img=document.createElement('img'); img.src=src;img.alt=item.name;img.loading='lazy';row.querySelector('.line__thumb')!.append(img); if(src.startsWith('/renders/')) { const note=document.createElement('span');note.textContent='Preview image';row.querySelector('.line__thumb')!.append(note); } }
       row.querySelector('[data-line-name]')!.textContent = item.name;
       row.querySelector('[data-line-opts]')!.textContent = Object.values(item.options).filter(Boolean).join(' · ') + (item.files?.length ? ` · ${item.files.length} file(s)` : '');
       row.querySelector('[data-line-qty]')!.textContent = String(item.quantity);
@@ -122,9 +126,9 @@ import { site } from '../config/site';
   .drawer__bar { height: 6px; border-radius: 3px; background: var(--grid); overflow: hidden; }
   .drawer__bar span { display: block; height: 100%; background: var(--accent); transition: width 400ms var(--ease); }
   .drawer__lines { display: flex; flex-direction: column; gap: 16px; }
-  .line { display: grid; grid-template-columns: 72px 1fr auto; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--grid); }
-  .line__thumb { width: 72px; height: 72px; border-radius: 12px; background: #e6e1d8; }
-  .line__info { display: flex; flex-direction: column; gap: 4px; }
+  .line { display: grid; grid-template-columns: 72px minmax(0,1fr) auto; gap: 14px; padding-bottom: 16px; border-bottom: 1px solid var(--grid); }
+  .line__thumb :global(img) {width:100%;height:100%;object-fit:cover;border-radius:12px} .line__thumb :global(span) {position:absolute;bottom:0;left:0;font-size:9px;background:white;padding:2px} .line__thumb {position:relative; width: 72px; height: 72px; border-radius: 12px; background: #e6e1d8; }
+  .line__info { overflow-wrap:anywhere; display: flex; flex-direction: column; gap: 4px; }
   .line__qty { display: flex; align-items: center; gap: 12px; margin-top: 4px; }
   .line__qty button[data-line-step] { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--grid); }
   .line__qty [data-line-remove] { margin-left: 8px; text-decoration: underline; }
