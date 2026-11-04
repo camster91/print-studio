@@ -77,16 +77,16 @@ html.lenis, html.lenis body { height: auto; }
   font-family: var(--font-display);
   font-weight: 400;
   text-transform: uppercase;
-  line-height: 0.92;
-  letter-spacing: 0;
+  line-height: 0.94;
+  letter-spacing: 0.012em;
   color: var(--ink);
   text-wrap: balance;
 }
 .display-xl { font-size: clamp(3.5rem, 8.9vw, 8rem); }
 .display-l { font-size: clamp(2.75rem, 6.1vw, 5.5rem); }
 .display-m { font-size: clamp(2.25rem, 4.4vw, 4rem); }
-.display-s { font-size: clamp(1.75rem, 2.8vw, 2.5rem); }
-.display-xs { font-size: 1.75rem; line-height: 0.95; }
+.display-s { font-size: clamp(1.75rem, 2.8vw, 2.5rem); letter-spacing: 0.02em; }
+.display-xs { font-size: 1.75rem; line-height: 0.95; letter-spacing: 0.025em; }
 .body-l { font-size: clamp(1.0625rem, 1.4vw, 1.25rem); line-height: 1.5; color: var(--muted); }
 .body-m { font-size: 1rem; line-height: 1.5; color: var(--muted); }
 .body-s { font-size: 0.875rem; line-height: 1.5; color: var(--muted); }
@@ -252,7 +252,7 @@ html.lenis, html.lenis body { height: auto; }
 .swiper-slide { height: auto; }
 
 /* Wordmark */
-.wordmark { font-family: var(--font-display); text-transform: uppercase; font-size: 1.875rem; line-height: 1; color: var(--ink); letter-spacing: 0.005em; }
+.wordmark { font-family: var(--font-display); text-transform: uppercase; font-size: 1.875rem; line-height: 1; color: var(--ink); letter-spacing: 0.03em; }
 .wordmark span { color: var(--accent); }
 .wordmark--light { color: var(--paper); }
 @media (max-width: 767px) { .wordmark { font-size: 1.5rem; } }

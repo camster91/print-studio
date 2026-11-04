@@ -3,6 +3,12 @@ import { site } from '../config/site';
 
 export type ProductType = 'in-stock' | 'made-to-order';
 export type SizeOption = { label: string; price: number };
+/** A choice value: plain label, or a label that sets the price (`price`) or adds to it (`add`). */
+export type ChoiceValue = string | { label: string; price?: number; add?: number };
+export type Choice = { name: string; values: ChoiceValue[] };
+export type Field = { name: string; label: string; placeholder?: string; max?: number; required?: boolean };
+export { valueLabel, valuePrice, valueAdd, defaultValue } from './pricing';
+import { valuePrice } from './pricing';
 export type Product = {
   slug: string;
   name: string;
@@ -32,6 +38,8 @@ export type Product = {
     logo?: boolean;
     place?: string;
     drawer?: string;
+    choices?: Choice[];
+    fields?: Field[];
   };
 };
 
@@ -62,14 +70,13 @@ export const typeLabel: Record<ProductType, string> = {
 
 /** Copy shown on cards and product pages. Edit freely. */
 export const blurbs: Record<string, string> = {
-  'm18-battery-mount-5-pack': 'Click-in wall mounts for M18 packs. Screws included.',
-  'dewalt-20v-battery-mount-6-pack': 'Six slide-on mounts for 20V packs. Screws included.',
-  'ryobi-tool-holder-5-pack': 'Hang ONE+ drills and drivers by the battery slot.',
+  'battery-mounts': 'Click-in wall mounts for your tool batteries. Pick your brand. Screws included.',
+  'tool-holders': 'Hang drills, drivers and saws by the battery slot. Pick your brand.',
   'skadis-hook-8-pack': 'Snap-in hooks for IKEA Skadis pegboards.',
   'under-desk-headphone-hook': 'Screws under any desk. Headphones off the desk.',
   'controller-wall-mount-4-pack': 'Show off four controllers on the wall.',
-  'stream-deck-stand': 'Angled stand for the Stream Deck MK.2.',
-  'on-air-light-box': 'Classic ON AIR light box. USB powered.',
+  'stream-deck-stand': 'Angled stand for your Stream Deck. Pick your model and angle.',
+  'on-air-light-box': 'Classic ON AIR light box, or your own words. USB powered.',
   'moon-lamp-10cm': 'Real NASA elevation data, lit from inside.',
   'lithophane-photo-box': 'Four of your photos that glow when lit.',
   'pet-memorial-light': 'Your pet’s photo and name, softly lit.',
@@ -87,6 +94,8 @@ export const money = (n: number) =>
 
 export function priceLabel(p: Product) {
   if (p.options.size?.length) return `From ${money(Math.min(...p.options.size.map((s) => s.price)))}`;
+  const priced = (p.options.choices ?? []).flatMap((c) => c.values.map(valuePrice)).filter((n): n is number => typeof n === 'number');
+  if (priced.length) return `From ${money(Math.min(...priced))}`;
   if (p.priceFrom) return `From ${money(p.price)}`;
   if (p.bulk?.length && p.slug === 'qr-review-stand') return `${money(p.price)} · 3+ $20 each`;
   return money(p.price);

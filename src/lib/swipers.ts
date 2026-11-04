@@ -1,13 +1,26 @@
 import Swiper from 'swiper';
-import { Navigation, Pagination, FreeMode, A11y } from 'swiper/modules';
+import { Navigation, Pagination, FreeMode, A11y, Autoplay, EffectFade } from 'swiper/modules';
 import 'swiper/css';
+import 'swiper/css/effect-fade';
 
 /**
  * [data-swiper="cards"]   product cards: a carousel on phones, a grid on desktop
  * [data-swiper="rail"]    horizontal rail with arrows + pagination (LED signs, reviews)
  * [data-swiper="gallery"] product gallery with thumbnails
+ * [data-swiper="hero"]    home hero: fading photo slider (autoplay off for reduced motion)
  */
 export function startSwipers() {
+  document.querySelectorAll<HTMLElement>('[data-swiper="hero"]').forEach((el) => {
+    const root = el.closest('[data-swiper-root]') ?? el.parentElement!;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    new Swiper(el, {
+      modules: [Pagination, A11y, Autoplay, EffectFade],
+      effect: 'fade', fadeEffect: { crossFade: true }, speed: still ? 0 : 700, loop: true,
+      autoplay: still ? false : { delay: 4500, disableOnInteraction: false, pauseOnMouseEnter: true },
+      pagination: { el: root.querySelector<HTMLElement>('[data-pagination]'), clickable: true },
+    });
+  });
+
   document.querySelectorAll<HTMLElement>('[data-swiper="rail"]').forEach((el) => {
     const root = el.closest('[data-swiper-root]') ?? el.parentElement!;
     new Swiper(el, {

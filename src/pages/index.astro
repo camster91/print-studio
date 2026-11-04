@@ -3,12 +3,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import ProductCard from '../components/ProductCard.astro';
 import Photo from '../components/Photo.astro';
 import Faq from '../components/Faq.astro';
-import { products, filamentColours } from '../lib/products';
+import { products, filamentColours, priceLabel } from '../lib/products';
 import { faq } from '../data/faq';
 import reviewsData from '../data/reviews.json';
 import { site } from '../config/site';
 
-const featured = ['led-name-sign', 'lithophane-photo-box', 'qr-review-stand', 'm18-battery-mount-5-pack'].map((s) => products.find((p) => p.slug === s)!);
+const featured = ['led-name-sign', 'lithophane-photo-box', 'qr-review-stand', 'battery-mounts'].map((s) => products.find((p) => p.slug === s)!);
+const heroSlides = [
+  ['led-name-sign', '/renders/home-led-studio.webp', 'Glowing LED name sign above a dark desk'],
+  ['lithophane-photo-box', '/renders/lithophane-photo-box.webp', 'Lithophane photo box glowing on a shelf'],
+  ['qr-review-stand', '/renders/qr-review-stand.webp', 'QR review stand on a café counter'],
+  ['moon-lamp-10cm', '/renders/moon-lamp-10cm.webp', 'Moon lamp glowing on a bedside table'],
+  ['battery-mounts', '/renders/m18-battery-mount-5-pack.webp', 'Battery mounts on a garage wall'],
+].map(([slug, src, alt]) => ({ p: products.find((x) => x.slug === slug)!, src, alt }));
 const reviews = reviewsData.reviews as { quote: string; name: string; product: string; stars: number }[];
 const ledSigns = [
   { title: 'Streamer name', cap: 'NAME SIGN, LIT, DARK DESK', glow: 'cyan', src: '/renders/led-name-sign.webp' },
@@ -43,10 +50,30 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
           <div><dt class="mono-s">Finest layer</dt><dd class="display-s">0.12 mm</dd></div>
         </dl>
       </div>
-      <div class="hero__visual" data-reveal="fade">
-        <Photo caption="LED name sign, lit, dark desk setup" src="/renders/home-led-studio.webp" alt="Glowing orange LED sign above a dark desk setup" tone="dark" class="hero__photo" eager />
-        <div class="hero__dim mono-s" aria-hidden="true"><span></span>← 200 mm →<span></span></div>
-        <span class="tag">0.2 mm · PLA matte · 3 h 40 m</span>
+      <div class="hero__visual" data-reveal="fade" data-swiper-root>
+        <div class="swiper hero__slider" data-swiper="hero" aria-label="Things we print">
+          <div class="swiper-wrapper">
+            {heroSlides.map((s, i) => (
+              <div class="swiper-slide hero__slide">
+                <img src={s.src} alt={s.alt} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
+                <a href={`/products/${s.p.slug}`} class="hero__product">
+                  <span class="stack"><span class="label-m">{s.p.name}</span><span class="mono-s hero__price">{priceLabel(s.p)}</span></span>
+                  <span class="hero__go" aria-hidden="true">→</span>
+                </a>
+              </div>
+            ))}
+          </div>
+          <span class="hero__ai mono-s">Preview images</span>
+          <div class="hero__dots" data-pagination></div>
+        </div>
+        <div class="float-card float-card--proof" aria-hidden="true">
+          <span class="float-card__icon">✓</span>
+          <span class="stack"><span class="label-m">Free proof first</span><span class="mono-s">Reply in 24 h</span></span>
+        </div>
+        <div class="float-card float-card--made" aria-hidden="true">
+          <span class="float-card__dot"></span>
+          <span class="stack"><span class="label-m">Made in Toronto</span><span class="mono-s">Pickup or ship</span></span>
+        </div>
       </div>
     </div>
   </section>
@@ -209,15 +236,32 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
 
 <style>
   .hero { padding-block: 72px 96px; }
-  .hero__grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center; }
+  .hero__grid { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+  .hero__grid > * { min-width: 0; }
   .hero__lead { max-width: 560px; }
   .hero__stats { display: flex; gap: 40px; padding-top: 16px; }
   .hero__stats div { display: flex; flex-direction: column-reverse; gap: 4px; }
   .hero__stats dt { color: var(--muted); }
-  .hero__visual { display: flex; flex-direction: column; align-items: center; gap: 12px; }
-  :global(.hero__photo) { width: 100%; aspect-ratio: 1; border-radius: 24px; }
-  .hero__dim { display: flex; align-items: center; gap: 12px; width: 100%; }
-  .hero__dim span { flex: 1; height: 1px; background: var(--ink); }
+  .hero__visual { position: relative; }
+  .hero__slider { width: 100%; aspect-ratio: 1; border-radius: 24px; overflow: hidden; background: var(--chamber); }
+  .hero__slide { position: relative; height: 100%; }
+  .hero__slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero__product { position: absolute; left: 20px; right: 20px; bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 14px 16px 14px 20px; border-radius: 16px; background: rgb(244 242 238 / 0.92); backdrop-filter: blur(8px); color: var(--ink); box-shadow: 0 12px 32px rgb(0 0 0 / 0.18); }
+  .hero__price { color: var(--muted); }
+  .hero__go { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-weight: 600; flex: none; transition: transform 200ms var(--ease); }
+  .hero__product:hover .hero__go { transform: translateX(3px); }
+  .hero__ai { position: absolute; top: 16px; right: 16px; z-index: 2; padding: 4px 10px; border-radius: 999px; background: rgb(20 20 20 / 0.55); color: #fff; font-size: 0.625rem; }
+  .hero__dots { position: absolute; top: 20px; left: 20px; z-index: 2; display: flex; gap: 6px; width: auto !important; }
+  .hero__dots :global(.swiper-pagination-bullet) { width: 22px; height: 4px; border-radius: 2px; background: rgb(255 255 255 / 0.45); opacity: 1; margin: 0 !important; cursor: pointer; transition: background 200ms; }
+  .hero__dots :global(.swiper-pagination-bullet-active) { background: #fff; }
+  .float-card { position: absolute; z-index: 3; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: 16px; background: var(--paper); box-shadow: 0 16px 40px rgb(20 20 20 / 0.16); animation: float 6s ease-in-out infinite; }
+  .float-card .mono-s { color: var(--muted); }
+  .float-card--proof { left: -36px; top: 64px; }
+  .float-card--made { right: -28px; top: 46%; animation-delay: -3s; }
+  .float-card__icon { width: 32px; height: 32px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-weight: 700; }
+  .float-card__dot { width: 10px; height: 10px; border-radius: 50%; background: #2ec4b6; box-shadow: 0 0 0 6px rgb(46 196 182 / 0.2); }
+  @keyframes float { 50% { transform: translateY(-10px); } }
+  @media (prefers-reduced-motion: reduce) { .float-card { animation: none; } }
   .marquee { background: var(--accent); overflow: hidden; padding-block: 20px; }
   .marquee__track { display: flex; gap: 40px; width: max-content; padding-left: 40px; }
   .marquee__track .display-s { color: var(--ink); white-space: nowrap; }
@@ -262,7 +306,10 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
   .cta__bar span { display: block; width: 20%; height: 100%; background: var(--accent); }
   .cta__opts { border: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media (max-width: 991px) {
-    .hero__grid { grid-template-columns: 1fr; }
+    .hero__grid { grid-template-columns: minmax(0, 1fr); }
+    .float-card--proof { left: 12px; top: auto; bottom: 108px; }
+    .float-card--made { right: 12px; top: 56px; }
+    .float-card { padding: 10px 12px; }
     .colours { grid-template-columns: repeat(5, 1fr); }
   }
   @media (max-width: 767px) {

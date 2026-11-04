@@ -2,7 +2,8 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Photo from '../../components/Photo.astro';
 import ProductCard from '../../components/ProductCard.astro';
-import { products, type Product, typeLabel, audience, blurbs, money, filamentColours } from '../../lib/products';
+import { products, type Product, typeLabel, audience, blurbs, money, filamentColours, valueLabel, valuePrice, valueAdd, defaultValue } from '../../lib/products';
+import { unitPrice } from '../../lib/pricing';
 import { site } from '../../config/site';
 
 export function getStaticPaths() {
@@ -14,13 +15,16 @@ const mto = p.type === 'made-to-order';
 const colours = p.options.frameColour ?? p.options.colour ?? [];
 const colourKey = p.options.frameColour ? 'Frame colour' : 'Colour';
 const startSize = p.options.size?.find((s) => s.price === p.price) ?? p.options.size?.[0];
-const startPrice = startSize?.price ?? p.price;
-const shots = p.led ? ['Hero, lit', 'Unlit, daylight', 'Detail of layers', 'In hand, for scale', 'In use'] : ['Hero', 'Detail of layers', 'In hand, for scale', 'In use', 'All colours'];
+const startPrice = unitPrice(p, {}, 1);
+const choices = p.options.choices ?? [];
+const fields = p.options.fields ?? [];
+const placeholderShots = p.led ? ['Hero, lit', 'Unlit, daylight', 'Detail of layers', 'In hand, for scale', 'In use'] : ['Hero', 'Detail of layers', 'In hand, for scale', 'In use', 'All colours'];
+const shots = p.images?.length ? p.images.map((_, i) => (i === 0 ? 'Hero' : `Photo ${i + 1}`)) : placeholderShots;
 const related = products.filter((x) => x.slug !== p.slug && (x.category === p.category || x.type === p.type)).slice(0, 4);
 const photoCount = p.options.photos ?? 0;
 const needsLogo = p.options.logo;
 const details = [
-  { q: 'Details', a: `${p.material}${p.colours > 1 ? `, ${p.colours} colours` : ''}. About ${p.printHours} hours of printing per piece.${p.fits ? ` Fits ${p.fits}. Not affiliated with or endorsed by the brand.` : ''}${p.led ? ' Includes a certified USB LED and cable; use any USB phone charger.' : ''}${p.credit ? ` ${p.credit}.` : ''}` },
+  { q: 'Details', a: `${p.material}${p.colours > 1 ? `, ${p.colours} colours` : ''}. About ${p.printHours} hours of printing per piece.${p.fits ? ` Fits ${p.fits}.` : ''}${p.fits || choices.some((c) => c.name === 'Brand' || c.name === 'Device' || c.name === 'Controller') ? ' Brand names only describe what it fits. Not affiliated with or endorsed by any brand.' : ''}${p.led ? ' Includes a certified USB LED and cable; use any USB phone charger.' : ''}${p.credit ? ` ${p.credit}.` : ''}` },
   { q: 'Timing', a: mto ? `Made to order. We email a proof within 24 hours and print in 5–7 business days after you approve.${site.holidayCutoff ? ` Order by ${site.holidayCutoff} for Christmas.` : ''}` : 'In stock. Ships in 1–2 business days, or pick up in Toronto.' },
   { q: 'Shipping & pickup', a: `Free pickup in Toronto's east end. Canada Post tracked shipping $${site.shippingCanada}, free over $${site.freeShippingFrom}.` },
   { q: 'Care', a: p.material === 'PLA' ? 'Indoor use. Keep out of hot cars and direct sun. Wipe with a dry or damp cloth.' : 'Handles garages and sheds. Wipe clean with a damp cloth.' },
@@ -38,13 +42,13 @@ const details = [
           {shots.map((s, i) => <div class="swiper-slide"><Photo caption={`${p.name} — ${s}`} src={p.images?.[i]} tone={p.led && i === 0 ? 'warm' : 'default'} class="gallery__photo" eager={i === 0} /></div>)}
         </div>
       </div>
-      <div class="thumbs">
+      <div class="thumbs" hidden={shots.length < 2}>
         {shots.map((s, i) => <button data-thumb aria-label={`Show photo ${i + 1}: ${s}`}><Photo caption={s} src={p.images?.[i]} class="thumb" /></button>)}
       </div>
     </div>
 
     <form class="buy" data-buy data-slug={p.slug} data-name={p.name} data-type={p.type} data-base={p.price}
-      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0}>
+      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0} data-choices={JSON.stringify(choices)}>
       <div class="row gap-12 wrap"><span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span><span class="mono-s kicker">{audience[p.category]}</span></div>
       <h1 class="display-l">{p.name}</h1>
       <p class="row gap-12" style="align-items:baseline"><span class="display-m" data-price>{money(startPrice)}</span><span class="body-m">CAD · free Toronto pickup</span></p>
@@ -55,6 +59,18 @@ const details = [
           <div class="row gap-8 wrap">{p.options.size.map((s) => <label class="chip"><input type="radio" name="Size" value={s.label} checked={s === startSize} />{s.label} · {money(s.price)}</label>)}</div>
         </fieldset>
       )}
+
+      {choices.map((c) => {
+        const def = valueLabel(defaultValue(c, p.price));
+        return (
+          <fieldset class="opt"><legend class="mono-s">{c.name}</legend>
+            <div class="row gap-8 wrap">{c.values.map((v) => {
+              const price = valuePrice(v); const add = valueAdd(v);
+              return <label class="chip"><input type="radio" name={c.name} value={valueLabel(v)} checked={valueLabel(v) === def} />{valueLabel(v)}{typeof price === 'number' ? ` · ${money(price)}` : add ? ` · +${money(add)}` : ''}</label>;
+            })}</div>
+          </fieldset>
+        );
+      })}
 
       {colours.length > 0 && (
         <fieldset class="opt"><legend class="mono-s">{colourKey}: <span data-colour-name>{colours[0]}</span></legend>
@@ -78,6 +94,10 @@ const details = [
       {p.options.link && (
         <div class="field opt"><label for="opt-link">Where should the QR go?</label><input id="opt-link" class="input" name="Link" maxlength="60" required placeholder="Google review, booking or menu link" /></div>
       )}
+
+      {fields.map((f) => (
+        <div class="field opt"><label for={`opt-${f.name}`}>{f.label}</label><input id={`opt-${f.name}`} class="input" name={f.name} maxlength={f.max ?? 60} required={f.required} placeholder={f.placeholder} /></div>
+      ))}
 
       {(photoCount > 0 || needsLogo) && (
         <fieldset class="opt" data-uploads data-max={photoCount || 1}>
@@ -147,13 +167,23 @@ const details = [
   const addons: { label: string; price: number }[] = JSON.parse(d.addons!);
   const bulk: { min: number; price: number }[] = JSON.parse(d.bulk!);
   const setup = Number(d.setup);
+  type CV = string | { label: string; price?: number; add?: number };
+  const choices: { name: string; values: CV[] }[] = JSON.parse(d.choices!);
+  const lab = (v: CV) => (typeof v === 'string' ? v : v.label);
   let qty = 1;
   const files: (string | null)[] = [];
 
   const unit = () => {
     const size = sizes.find((s) => s.label === (form.elements.namedItem('Size') as RadioNodeList | null)?.value);
     let u = size ? size.price : Number(d.base);
-    if (!size && bulk.length) { const t = [...bulk].sort((a, b) => b.min - a.min).find((b) => qty >= b.min); if (t) u = t.price; }
+    let priceSet = !!size; let extra = 0;
+    for (const c of choices) {
+      const picked = (form.elements.namedItem(c.name) as RadioNodeList | null)?.value;
+      const v = c.values.find((x) => lab(x) === picked);
+      if (v && typeof v !== 'string') { if (typeof v.price === 'number') { u = v.price; priceSet = true; } extra += v.add ?? 0; }
+    }
+    if (!priceSet && bulk.length) { const t = [...bulk].sort((a, b) => b.min - a.min).find((b) => qty >= b.min); if (t) u = t.price; }
+    u += extra;
     form.querySelectorAll<HTMLInputElement>('[data-addon]').forEach((a) => { if (a.checked) u += addons.find((x) => x.label === a.dataset.addon)?.price ?? 0; });
     return u;
   };

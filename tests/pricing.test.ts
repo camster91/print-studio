@@ -7,8 +7,10 @@ const products = JSON.parse(readFileSync(new URL('../src/data/products.json', im
 const p = (slug: string) => products.find((x: any) => x.slug === slug);
 
 test('base price for in-stock item', () => {
-  const l = priceLine(products, { slug: 'm18-battery-mount-5-pack', quantity: 2, options: { Colour: 'Red' } });
+  const l = priceLine(products, { slug: 'battery-mounts', quantity: 2, options: { Colour: 'Red' } });
   assert.equal(l.unit, 28);
+  assert.equal(l.options.Pack, '5-pack');
+  assert.equal(l.options.Brand, 'Milwaukee M18');
   assert.equal(subtotal([l]), 56);
 });
 
@@ -31,7 +33,7 @@ test('bulk tier and add-on and setup fee', () => {
 test('browser cannot set its own price or bad options', () => {
   const l = priceLine(products, { slug: 'on-air-light-box', quantity: 1, options: { price: '1' } as any });
   assert.equal(l.unit, 45);
-  assert.throws(() => priceLine(products, { slug: 'm18-battery-mount-5-pack', quantity: 1, options: { Colour: 'Gold' } }), /not a valid colour/);
+  assert.throws(() => priceLine(products, { slug: 'battery-mounts', quantity: 1, options: { Colour: 'Gold' } }), /not a valid colour/);
   assert.throws(() => priceLine(products, { slug: 'nope', quantity: 1 }), /Unknown product/);
   assert.throws(() => priceLine(products, { slug: 'on-air-light-box', quantity: 0 }), /Quantity/);
   assert.throws(() => priceLine(products, { slug: 'on-air-light-box', quantity: 999 }), /Quantity/);
@@ -41,4 +43,16 @@ test('browser cannot set its own price or bad options', () => {
 test('file keys are filtered', () => {
   const l = priceLine(products, { slug: 'pet-memorial-light', quantity: 1, options: { Text: 'Rex' }, files: ['uploads/2026-11/a.jpg', '../../etc/passwd', 'https://evil'] });
   assert.deepEqual(l.files, ['uploads/2026-11/a.jpg']);
+});
+
+test('choices set or add to the price, and are checked', () => {
+  assert.equal(unitPrice(p('battery-mounts'), { Pack: '10-pack', Brand: 'Makita 18V LXT' }), 49);
+  assert.equal(unitPrice(p('battery-mounts'), { Pack: '1 mount' }), 8);
+  assert.equal(unitPrice(p('stream-deck-stand'), { Device: 'Stream Deck XL' }), 29 + 6);
+  assert.equal(unitPrice(p('led-name-sign'), { Size: 'Large · 45 cm' }), 79);
+  assert.equal(unitPrice(p('lithophane-photo-box'), { Size: '150 mm', Light: 'Colour-changing + remote' }), 69 + 8);
+  assert.throws(() => priceLine(products, { slug: 'tool-holders', quantity: 1, options: { Brand: 'Hilti' } }), /not a valid brand/);
+  const l = priceLine(products, { slug: 'desk-nameplate', quantity: 1, options: { Text: 'Sam', 'Second line': 'x'.repeat(99) } });
+  assert.equal(l.options['Second line'].length, 30);
+  assert.equal(l.options.Style, 'Wedge');
 });
