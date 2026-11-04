@@ -3,7 +3,7 @@ import { site } from '../config/site';
 type AnalyticsWindow=Window & {dataLayer?: unknown[];gtag?:(...args:unknown[])=>void};
 export function track(event:string, ecommerce:Record<string,unknown>){
   const w=window as AnalyticsWindow;
-  if(localStorage.getItem('layerline-analytics-consent')!=='yes')return;
+  try {if(localStorage.getItem('layerline-analytics-consent')!=='yes')return;}catch{return;}
   if(site.analytics.gtmId && Array.isArray(w.dataLayer)){w.dataLayer.push({ecommerce:null});w.dataLayer.push({event,ecommerce});}
   else w.gtag?.('event',event,ecommerce);
 }
