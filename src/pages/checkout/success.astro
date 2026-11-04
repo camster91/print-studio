@@ -1,0 +1,26 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { site } from '../../config/site';
+---
+
+<BaseLayout title="Order confirmed" noindex>
+  <section class="container done">
+    <div class="done__tick" aria-hidden="true">✓</div>
+    <p class="mono-m kicker">Payment received</p>
+    <h1 class="display-xl">Thank you. It's on the build plate.</h1>
+    <p class="body-l">Stripe has emailed your receipt. Made-to-order items get a proof by email within 24 hours. In-stock items ship in 1–2 business days, or we'll email you when your pickup is ready.</p>
+    <p class="body-m">Questions? Email <a href={`mailto:${site.email}`} style="text-decoration:underline">{site.email}</a>.</p>
+    <a href="/shop" class="btn btn--dark">Back to the shop</a>
+  </section>
+</BaseLayout>
+
+<script>
+  import { clearCart } from '../../lib/cart';
+  clearCart();
+</script>
+
+<style>
+  .done { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; padding-block: 120px 140px; }
+  .done .body-l { max-width: 680px; }
+  .done__tick { width: 96px; height: 96px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-size: 2.75rem; font-weight: 700; }
+</style>

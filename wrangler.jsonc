@@ -1,11 +1,24 @@
 {
-  // Worker name. The first deploy creates the worker and it goes live at
-  // <name>.<account>.workers.dev
+  // Static Astro site + a small Worker for /api/* (Stripe checkout, uploads, quote requests).
   "name": "layerline",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-09-30",
-  // Purely static: Workers just serves the built dist/ as assets. No "main" entry-point.
+  "compatibility_flags": ["nodejs_compat"],
   "assets": {
-    "directory": "./dist"
+    "directory": "./dist",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*"],
+    "not_found_handling": "404-page"
   },
-  "workers_dev": true
+  "workers_dev": true,
+  "vars": {
+    "FREE_SHIPPING_FROM": "100",
+    "SHIPPING_CANADA": "12"
+    // "NOTIFY_TO": "you@example.com"   // verified Email Routing destination for new requests
+  },
+  // Create once: npx wrangler r2 bucket create layerline-uploads
+  "r2_buckets": [{ "binding": "UPLOADS", "bucket_name": "layerline-uploads" }]
+  // Optional email alerts for new requests (needs Email Routing on your domain):
+  // "send_email": [{ "name": "SEND_EMAIL" }]
+  // Secret (never commit): npx wrangler secret put STRIPE_SECRET_KEY
 }

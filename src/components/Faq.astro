@@ -1,260 +1,32 @@
 ---
-import { noOrphan } from '../lib/typography';
-
-interface Props {
-  title: string;
-  items: { question: string; answer?: string }[];
-}
-
-const { title, items } = Astro.props;
+interface Props { items: { q: string; a: string }[]; id?: string; title?: string; kicker?: string }
+const { items, id = 'faq', title = 'Questions, answered', kicker = 'FAQ' } = Astro.props;
 ---
 
-<section class="faq">
-  <div class="faq__inner container container--padded">
-    <h2 class="faq__title t-display" data-reveal="lines">{noOrphan(title)}</h2>
-    <div class="faq__list">
-      {
-        items.map((item, i) => {
-          const index = String(i + 1).padStart(2, '0');
-          return item.answer ? (
-            <details class="faq__item" data-reveal name="faq" open={i === 0}>
-              <summary class="faq__summary hit">
-                <span class="faq__index t-index">{index}</span>
-                <h3 class="faq__question t-title">{noOrphan(item.question)}</h3>
-                <span class="faq__icon" aria-hidden="true" />
-              </summary>
-              <div class="faq__panel">
-                <p class="faq__answer t-body">{noOrphan(item.answer)}</p>
-              </div>
-            </details>
-          ) : (
-            <div class="faq__item" data-reveal>
-              <div class="faq__summary">
-                <span class="faq__index t-index">{index}</span>
-                <h3 class="faq__question t-title">{noOrphan(item.question)}</h3>
-                <span class="faq__icon" aria-hidden="true" />
-              </div>
-            </div>
-          );
-        })
-      }
+<section class="section faq" id={id}>
+  <div class="container faq__grid">
+    <div class="stack gap-16">
+      <p class="mono-m kicker">{kicker}</p>
+      <h2 class="display-m" data-reveal>{title}</h2>
+    </div>
+    <div class="faq__items">
+      {items.map((it, i) => (
+        <details open={i === 0} data-reveal>
+          <summary class="label-l">{it.q}<span aria-hidden="true" class="faq__icon">+</span></summary>
+          <p class="body-m">{it.a}</p>
+        </details>
+      ))}
     </div>
   </div>
 </section>
 
-<script>
-  const DURATION = 500;
-  const EASING = 'cubic-bezier(0.33, 1, 0.68, 1)';
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const items = [...document.querySelectorAll<HTMLDetailsElement>('details.faq__item')];
-  const running = new Map<HTMLDetailsElement, Animation>();
-
-  const panelOf = (item: HTMLDetailsElement) => item.querySelector<HTMLElement>('.faq__panel')!;
-
-  const animate = (item: HTMLDetailsElement, from: number, to: number, done?: () => void) => {
-    running.get(item)?.cancel();
-    if (reduced.matches) {
-      done?.();
-      return;
-    }
-    const anim = panelOf(item).animate({ height: [`${from}px`, `${to}px`] }, { duration: DURATION, easing: EASING });
-    running.set(item, anim);
-    anim.onfinish = () => {
-      running.delete(item);
-      done?.();
-    };
-  };
-
-  const close = (item: HTMLDetailsElement) => {
-    if (!item.open || item.classList.contains('is-closing')) return;
-    item.classList.add('is-closing');
-    animate(item, panelOf(item).offsetHeight, 0, () => {
-      item.open = false;
-      item.classList.remove('is-closing');
-    });
-  };
-
-  let pin = 0;
-  const holdInPlace = (item: HTMLDetailsElement) => {
-    cancelAnimationFrame(pin);
-    const head = item.querySelector('summary')!;
-    let last = head.getBoundingClientRect().top;
-    const end = performance.now() + DURATION + 50;
-    const step = () => {
-      const top = head.getBoundingClientRect().top;
-      if (top !== last) window.scrollBy({ top: top - last, behavior: 'instant' });
-      last = head.getBoundingClientRect().top;
-      if (performance.now() < end) pin = requestAnimationFrame(step);
-    };
-    pin = requestAnimationFrame(step);
-  };
-
-  const open = (item: HTMLDetailsElement) => {
-    const from = item.classList.contains('is-closing') ? panelOf(item).offsetHeight : 0;
-    item.classList.remove('is-closing');
-    item.open = true;
-    animate(item, from, panelOf(item).querySelector<HTMLElement>('.faq__answer')!.offsetHeight);
-    items.forEach((other) => other !== item && close(other));
-    holdInPlace(item);
-  };
-
-  items.forEach((item) => {
-    item.removeAttribute('name');
-    item.querySelector('summary')!.addEventListener('click', (event) => {
-      event.preventDefault();
-      if (item.open && !item.classList.contains('is-closing')) close(item);
-      else open(item);
-    });
-  });
-</script>
-
 <style>
-  .faq__inner {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6.25rem;
-    padding-block: 3.75rem;
-  }
-
-  .faq__title {
-    max-width: 44.75rem;
-    text-align: center;
-    color: var(--color-primary);
-  }
-
-  .faq__list {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    width: 100%;
-    max-width: 54.25rem;
-  }
-
-  .faq__item {
-    padding-block: 1rem;
-    border-bottom: 1px solid var(--color-border);
-  }
-
-  .faq__summary {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    list-style: none;
-  }
-
-  details .faq__summary {
-    cursor: pointer;
-  }
-
-  .faq__summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .faq__index {
-    flex-shrink: 0;
-    width: 1.5rem;
-    color: var(--color-text-secondary);
-    transition: color var(--transition-base);
-  }
-
-  .faq__question {
-    flex: 1 1 0;
-    min-width: 0;
-    color: var(--color-text-primary);
-    transition: color var(--transition-base), translate 0.4s cubic-bezier(0.33, 1, 0.68, 1);
-  }
-
-  .faq__item {
-    transition: border-color var(--transition-base);
-  }
-
-  .faq__icon {
-    transition: scale 0.4s cubic-bezier(0.33, 1, 0.68, 1);
-  }
-
-  @media (min-width: 992px) and (hover: hover) and (pointer: fine) {
-    .faq__item:hover {
-      border-color: var(--color-primary);
-    }
-
-    .faq__summary:hover .faq__index,
-    .faq__summary:hover .faq__question {
-      color: var(--color-primary);
-    }
-
-    /* Only a closed question slides: an open one stays put under the pointer. */
-    .faq__item:not([open]) > .faq__summary:hover .faq__question {
-      translate: 0.5rem 0;
-    }
-
-    .faq__summary:hover .faq__icon {
-      scale: 1.15;
-    }
-  }
-
-  .faq__icon {
-    position: relative;
-    flex-shrink: 0;
-    width: 1.5rem;
-    height: 1.5rem;
-    color: var(--color-primary);
-  }
-
-  .faq__icon::before,
-  .faq__icon::after {
-    content: '';
-    position: absolute;
-    inset: 50% 0.1875rem auto;
-    height: 1.5px;
-    margin-top: -0.75px;
-    border-radius: 1px;
-    background-color: currentColor;
-    transition: rotate 0.4s cubic-bezier(0.33, 1, 0.68, 1);
-  }
-
-  .faq__icon::after {
-    rotate: 90deg;
-  }
-
-  .faq__item[open]:not(.is-closing) .faq__icon::after {
-    rotate: 0deg;
-  }
-
-  .faq__panel {
-    overflow: clip;
-  }
-
-  .faq__item:not([open]) .faq__panel {
-    display: none;
-  }
-
-  .faq__answer {
-    padding: 0.75rem 0 0 2.0625rem;
-  }
-
-  @media (max-width: 991px) {
-    .faq__inner {
-      gap: 4rem;
-    }
-  }
-
-  @media (max-width: 767px) {
-    .faq__inner {
-      gap: 2.5rem;
-      padding-block: 3rem;
-    }
-
-    .faq__list {
-      gap: 1rem;
-    }
-
-    .faq__summary {
-      gap: 0.75rem;
-    }
-
-    .faq__answer {
-      padding-left: 0;
-    }
-  }
+  .faq__grid { display: grid; grid-template-columns: 420px 1fr; gap: 80px; }
+  details { border-bottom: 1px solid var(--grid); padding-block: 22px; }
+  summary { display: flex; justify-content: space-between; gap: 16px; cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  .faq__icon { color: var(--accent-ink); font-size: 1.5rem; line-height: 1; transition: transform 250ms var(--ease); }
+  details[open] .faq__icon { transform: rotate(45deg); }
+  details p { margin-top: 12px; max-width: 720px; }
+  @media (max-width: 991px) { .faq__grid { grid-template-columns: 1fr; gap: 32px; } }
 </style>

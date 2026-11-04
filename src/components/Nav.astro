@@ -1,0 +1,75 @@
+---
+import { site } from '../config/site';
+const path = Astro.url.pathname;
+const links = [
+  { href: '/shop', label: 'Shop' },
+  { href: '/custom', label: 'Custom builds' },
+  { href: '/business', label: 'For business' },
+  { href: '/about', label: 'About' },
+  { href: '/#faq', label: 'FAQ' },
+];
+const active = (href: string) => href !== '/#faq' && path.startsWith(href);
+---
+
+<header class="nav">
+  <div class="nav__inner container">
+    <a href="/" class="wordmark" aria-label={`${site.name} home`}>Layer<span>line</span></a>
+    <nav aria-label="Main">
+      <ul class="nav__links">
+        {links.map((l) => <li><a href={l.href} class="label-m" aria-current={active(l.href) ? 'page' : undefined}>{l.label}</a></li>)}
+      </ul>
+    </nav>
+    <div class="nav__actions">
+      <button class="nav__bag mono-m" data-cart-open aria-label="Open bag">Bag (<span data-cart-count>0</span>)</button>
+      <a href="/custom" class="btn btn--dark nav__cta">Get a quote</a>
+      <button class="nav__menu mono-m" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="menu">Menu</button>
+    </div>
+  </div>
+</header>
+
+<dialog id="menu" class="menu on-dark" data-menu aria-label="Menu">
+  <div class="menu__top container">
+    <a href="/" class="wordmark wordmark--light">Layer<span>line</span></a>
+    <button class="label-l" data-menu-close aria-label="Close menu">✕</button>
+  </div>
+  <ul class="menu__links container">
+    {links.map((l) => <li><a href={l.href} class="display-s" aria-current={active(l.href) ? 'page' : undefined}>{l.label}<span aria-hidden="true">→</span></a></li>)}
+  </ul>
+  <div class="menu__foot container">
+    <a href="/custom" class="btn btn--primary btn--block">Start a custom build</a>
+    <p class="mono-s">{site.email} · Toronto pickup · Ships across Canada</p>
+  </div>
+</dialog>
+
+<script>
+  const menu = document.querySelector<HTMLDialogElement>('[data-menu]');
+  const openBtn = document.querySelector<HTMLButtonElement>('[data-menu-open]');
+  openBtn?.addEventListener('click', () => { menu?.showModal(); openBtn.setAttribute('aria-expanded', 'true'); });
+  menu?.querySelectorAll('[data-menu-close], a').forEach((el) => el.addEventListener('click', () => menu.close()));
+  menu?.addEventListener('close', () => openBtn?.setAttribute('aria-expanded', 'false'));
+</script>
+
+<style>
+  .nav { position: sticky; top: 0; z-index: 40; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--grid); }
+  .nav__inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding-block: 18px; }
+  .nav__links { display: flex; gap: 36px; }
+  .nav__links a[aria-current='page'] { color: var(--accent-ink); }
+  .nav__links a { position: relative; }
+  .nav__links a::after { content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px; background: var(--accent); transform: scaleX(0); transform-origin: left; transition: transform 250ms var(--ease); }
+  .nav__links a:hover::after, .nav__links a[aria-current='page']::after { transform: scaleX(1); }
+  .nav__actions { display: flex; align-items: center; gap: 16px; }
+  .nav__cta { padding: 12px 22px; }
+  .nav__menu { display: none; }
+  .menu { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; border: 0; background: var(--ink); display: none; flex-direction: column; padding-block: 16px 32px; }
+  .menu[open] { display: flex; }
+  .menu::backdrop { background: transparent; }
+  .menu__top { display: flex; justify-content: space-between; align-items: center; color: var(--paper); }
+  .menu__links { margin-top: 40px; flex: 1; }
+  .menu__links a { display: flex; justify-content: space-between; align-items: center; padding-block: 12px; border-bottom: 1px solid rgb(244 242 238 / 0.12); color: var(--paper); }
+  .menu__links a[aria-current='page'] { color: var(--accent); }
+  .menu__foot { display: flex; flex-direction: column; gap: 16px; color: var(--grid); }
+  @media (max-width: 991px) {
+    .nav__links, .nav__cta { display: none; }
+    .nav__menu { display: inline-flex; }
+  }
+</style>

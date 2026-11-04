@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" noindex>
+  <section class="container miss">
+    <p class="mono-m kicker">Error 404 · Page not found</p>
+    <h1 class="display-xl">Misprint.</h1>
+    <p class="body-l">This page turned into spaghetti. Let's get you back on the build plate.</p>
+    <div class="row gap-16 wrap" style="justify-content:center"><a href="/shop" class="btn btn--primary">Go to the shop</a><a href="/custom" class="btn btn--outline">Start a custom build</a></div>
+  </section>
+</BaseLayout>
+
+<style>
+  .miss { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; padding-block: 140px 160px; }
+  .miss .body-l { max-width: 560px; }
+</style>

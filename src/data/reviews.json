@@ -1,0 +1,4 @@
+{
+  "_note": "Add real customer reviews only (with permission). The reviews section stays hidden while this list is empty. Example entry: { \"quote\": \"...\", \"name\": \"Priya S.\", \"product\": \"Lithophane box\", \"stars\": 5 }",
+  "reviews": []
+}

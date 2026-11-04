@@ -1,0 +1,49 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Photo from '../components/Photo.astro';
+const values = [
+  ['Proof before print', 'You see it before we print it. One free change on every custom order.'],
+  ['Low waste', 'Colour-by-layer designs and batch printing keep purge waste close to zero.'],
+  ['Local first', 'Toronto pickup, Canadian shipping, Canadian filament where we can.'],
+  ['Safe by design', 'Certified USB LEDs only. PETG for anything that lives in a hot garage or car.'],
+];
+const numbers = [['0.12 mm', 'Finest layer'], ['24 h', 'Quote reply'], ['5–7', 'Day turnaround'], ['1', 'Printer, lots of coffee']];
+---
+
+<BaseLayout title="About" description="Layerline is a small 3D print studio in Toronto. Every order is designed, proofed, printed and packed by hand.">
+  <section class="container grid-2 hero">
+    <div class="stack gap-24">
+      <p class="mono-m kicker">About</p>
+      <h1 class="display-xl" data-split>One printer. One maker. Toronto.</h1>
+      <p class="body-l">Layerline is a small print studio run from home in Toronto by a web designer who got hooked on making real things. Every order is designed, proofed, printed and packed by hand.</p>
+    </div>
+    <Photo caption="Printer mid-print, layer macro" tone="dark" style="aspect-ratio: 5/6" eager />
+  </section>
+
+  <section class="section section--surface">
+    <div class="container">
+      <h2 class="display-m" style="margin-bottom:40px" data-reveal>How we work</h2>
+      <div class="grid-4">{values.map(([t, d]) => <div class="value"><h3 class="display-xs">{t}</h3><p class="body-s">{d}</p></div>)}</div>
+    </div>
+  </section>
+
+  <section class="section section--ink on-dark">
+    <div class="container numbers">{numbers.map(([n, l]) => <div><p class="display-l">{n}</p><p class="mono-s">{l}</p></div>)}</div>
+  </section>
+
+  <section class="section section--accent">
+    <div class="container cta">
+      <h2 class="display-l" style="color:var(--surface)">Got an idea? Let's print it.</h2>
+      <a href="/custom" class="btn btn--dark">Start a custom build</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero { padding-block: 72px 96px; }
+  .value { display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: 18px; border: 1px solid var(--grid); }
+  .numbers { display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+  .numbers .mono-s { color: var(--grid); }
+  .cta { display: flex; justify-content: space-between; align-items: center; gap: 32px; flex-wrap: wrap; }
+  @media (max-width: 767px) { .hero { padding-block: 32px 56px; } }
+</style>

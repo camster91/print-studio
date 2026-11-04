@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { site } from '../config/site';
+---
+
+<BaseLayout title="Shipping, returns & privacy" description="Shipping, pickup, returns and privacy at Layerline Studio.">
+  <article class="container policies">
+    <p class="mono-m kicker">Policies</p>
+    <h1 class="display-l">Shipping, returns & privacy</h1>
+    <p class="body-s">Plain-English starter policies. Review them before launch.</p>
+
+    <h2 class="display-xs" id="shipping">Shipping & pickup</h2>
+    <p class="body-m">Free pickup in Toronto's east end (we email the address when your order is ready). Canada Post tracked shipping is ${site.shippingCanada} and free over ${site.freeShippingFrom}. In-stock items ship in 1–2 business days; made-to-order items ship 5–7 business days after you approve your proof. US orders are quoted on request.</p>
+
+    <h2 class="display-xs" id="returns">Returns</h2>
+    <p class="body-m">In-stock items can be returned unused within 30 days for a refund (you pay return shipping). Personalised and custom items are made just for you, so they can't be returned once printing starts — but if anything arrives broken or wrong, email us a photo within 14 days and we'll reprint or refund it.</p>
+
+    <h2 class="display-xs" id="terms">Custom work</h2>
+    <p class="body-m">By uploading photos or logos you confirm you own them or have permission to use them. We don't print weapons or weapon parts, keys, copyrighted characters or logos you don't own, real people's faces without consent, or medical, car-safety or load-bearing parts. 3D printed items show fine layer lines; that's normal. Items for food contact are for short contact only, hand wash, and are not food-safe certified.</p>
+
+    <h2 class="display-xs" id="privacy">Privacy</h2>
+    <p class="body-m">We use your details only to make and deliver your order and to reply to you. Payments are handled by Stripe; we never see your card number. Uploaded files are kept only as long as needed for your order and any re-orders, and you can ask us to delete them anytime at {site.email}.</p>
+  </article>
+</BaseLayout>
+
+<style>
+  .policies { max-width: 820px; display: flex; flex-direction: column; gap: 18px; padding-block: 72px 120px; }
+  .policies h2 { margin-top: 24px; }
+</style>

@@ -1,0 +1,135 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Photo from '../components/Photo.astro';
+import { products } from '../lib/products';
+
+const forBiz = ['qr-review-stand', 'desk-nameplate'].map((s) => products.find((p) => p.slug === s)!);
+const extras = [
+  { title: 'NFC Tap Stand', text: 'Customers tap their phone. No camera needed.', price: '$40' },
+  { title: 'Table Numbers', text: 'Your colours and logo. Sets of 10+.', price: '$8 each' },
+  { title: 'Logo Keychains', text: 'Merch people actually keep.', price: '25+ $3.50' },
+  { title: '3D Logo Sign', text: 'A dimensional logo for your counter or wall.', price: '$60–$150' },
+];
+const rows = [
+  ['QR Review Stand', '$25', '$20', '$17'],
+  ['NFC Tap Stand', '$40', '$34', '$29'],
+  ['Desk Nameplate', '$29', '$25', '$22'],
+  ['Table Numbers (each)', '$10', '$9', '$8'],
+  ['Display Riser (set of 3)', '$35', '$30', '$26'],
+];
+const steps = [
+  ['01', 'Send your logo', 'And the link: Google review, booking page, menu or Wi-Fi.'],
+  ['02', 'Free mockup', 'We send a digital mockup the same day.'],
+  ['03', 'Free sample', 'Toronto & GTA: we drop off one stand. Test it for 7 days.'],
+  ['04', 'Order the rest', 'Pay by Stripe invoice or e-Transfer. Re-orders anytime.'],
+];
+---
+
+<BaseLayout title="For business" description="Branded QR and NFC review stands, nameplates, table numbers and logo signs for Toronto businesses. Free sample first.">
+  <section class="container grid-2 hero">
+    <div class="stack gap-24">
+      <p class="mono-m kicker">For cafés, salons & offices</p>
+      <h1 class="display-xl" data-split>More reviews. Faster payments.</h1>
+      <p class="body-l">Branded QR and NFC counter stands, desk nameplates, table numbers and logo signs. Printed in Toronto with your logo. We bring you a free sample first.</p>
+      <div class="row gap-16 wrap"><a href="#sample" class="btn btn--primary">Get a free sample</a><a href="#pricing" class="btn btn--outline">See bulk pricing</a></div>
+    </div>
+    <Photo caption="QR stand on salon counter, logo + Google review" style="aspect-ratio:1" eager />
+  </section>
+
+  <section class="section section--surface">
+    <div class="container">
+      <h2 class="display-m" style="margin-bottom:40px" data-reveal>What we make for businesses</h2>
+      <div class="grid-4">
+        {forBiz.map((p) => <ProductCard product={p} />)}
+        {extras.slice(0, 2).map((x) => (
+          <a href="#sample" class="card">
+            <Photo caption={x.title} />
+            <div class="card__body"><span class="badge badge--custom">Custom</span><h3 class="card__title">{x.title}</h3><p class="body-s">{x.text}</p><div class="card__row"><span class="card__price">{x.price}</span></div></div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2 class="display-m" style="margin-bottom:40px" data-reveal>Four steps, no risk</h2>
+      <ol class="grid-4">{steps.map(([n, t, d]) => <li class="step"><span class="mono-m kicker">{n}</span><h3 class="display-xs">{t}</h3><p class="body-s">{d}</p></li>)}</ol>
+    </div>
+  </section>
+
+  <section class="section section--ink on-dark" id="pricing">
+    <div class="container pricing">
+      <div class="stack gap-16">
+        <p class="mono-m kicker">Bulk pricing</p>
+        <h2 class="display-m">The more you order, the less each costs</h2>
+        <p class="body-m">Logo setup is a one-time $15. Prices in CAD.</p>
+      </div>
+      <table class="bulk">
+        <thead><tr><th class="mono-s">Item</th><th class="mono-s">1–2</th><th class="mono-s">3–9</th><th class="mono-s">10+</th></tr></thead>
+        <tbody>{rows.map((r) => <tr>{r.map((c, i) => (i === 0 ? <th scope="row" class="label-l">{c}</th> : <td class="mono-m">{c}</td>))}</tr>)}</tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="section" id="sample">
+    <div class="container sample">
+      <div class="stack gap-24">
+        <p class="mono-m kicker">Free sample</p>
+        <h2 class="display-m">Try one on your counter for a week</h2>
+        <p class="body-l">Toronto and GTA only. We drop it off, you test it with real customers, then decide. No obligation.</p>
+      </div>
+      <form class="sample__form" data-quote-form data-kind="business-sample">
+        <div class="two"><div class="field"><label for="b-biz">Business name</label><input id="b-biz" class="input" name="business" required autocomplete="organization" /></div>
+          <div class="field"><label for="b-name">Your name</label><input id="b-name" class="input" name="name" required autocomplete="name" /></div></div>
+        <div class="two"><div class="field"><label for="b-email">Email</label><input id="b-email" class="input" type="email" name="email" required autocomplete="email" /></div>
+          <div class="field"><label for="b-phone">Phone</label><input id="b-phone" class="input" type="tel" name="phone" autocomplete="tel" /></div></div>
+        <div class="field"><label for="b-link">Where should the QR go?</label><input id="b-link" class="input" name="link" placeholder="Google review, booking or menu link" /></div>
+        <fieldset class="field" style="border:0"><span class="field__label">What are you interested in?</span>
+          <div class="row gap-8 wrap">{['QR stand', 'NFC stand', 'Nameplates', 'Table numbers', 'Logo sign', 'Keychains'].map((x, i) => <label class="chip"><input type="checkbox" name="interest" value={x} checked={i < 1} />{x}</label>)}</div>
+        </fieldset>
+        <div class="field"><label for="b-logo">Logo (SVG, PNG or PDF)</label><input id="b-logo" class="input" type="file" name="files" accept=".svg,.png,.pdf,image/*" /></div>
+        <div class="field"><label for="b-addr">Address for drop-off (Toronto & GTA)</label><input id="b-addr" class="input" name="address" autocomplete="street-address" /></div>
+        <button class="btn btn--primary btn--block">Request my free sample</button>
+        <p class="body-s" role="status" data-form-status></p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { submitQuote } from '../lib/quote';
+  document.querySelectorAll<HTMLFormElement>('[data-quote-form]').forEach((form) =>
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = form.querySelector('[data-form-status]')!;
+      const btn = form.querySelector('button')!;
+      btn.disabled = true; status.textContent = 'Sending…';
+      try {
+        const { id } = await submitQuote(new FormData(form), form.dataset.kind!);
+        form.innerHTML = `<p class="display-s">Thanks! Request ${id} sent.</p><p class="body-m">We'll email you a mockup the same day (business days).</p>`;
+      } catch (err) {
+        status.textContent = (err as Error).message; btn.disabled = false;
+      }
+    }),
+  );
+</script>
+
+<style>
+  .hero { padding-block: 72px 96px; }
+  .step { display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: 18px; background: var(--surface); }
+  .pricing { display: grid; grid-template-columns: 420px 1fr; gap: 80px; }
+  .bulk { width: 100%; border-collapse: collapse; }
+  .bulk th, .bulk td { text-align: right; padding: 18px 0 18px 16px; border-bottom: 1px solid rgb(244 242 238 / 0.15); color: var(--paper); font-weight: 600; }
+  .bulk thead th { color: var(--grid); font-weight: 500; }
+  .bulk th:first-child { text-align: left; padding-left: 0; }
+  .sample { display: grid; grid-template-columns: 460px 1fr; gap: 80px; align-items: start; }
+  .sample__form { display: flex; flex-direction: column; gap: 20px; padding: 40px; border-radius: var(--r-panel); background: var(--surface); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 991px) {
+    .pricing, .sample { grid-template-columns: 1fr; gap: 40px; }
+    .hero { padding-block: 32px 56px; }
+  }
+  @media (max-width: 767px) { .two { grid-template-columns: 1fr; } .sample__form { padding: 24px; } .bulk th, .bulk td { padding-left: 8px; } }
+</style>

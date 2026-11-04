@@ -1,83 +1,54 @@
 ---
 import { site } from '../config/site';
-
-const links = [
-  { label: 'Refund policy', href: site.legal.refund },
-  { label: 'Privacy policy', href: site.legal.privacy },
-  { label: 'Terms of service', href: site.legal.terms },
-];
-
-const credit = { label: 'Temlis', href: 'https://temlis.com' };
+const year = new Date().getFullYear();
 ---
 
-<footer class="footer">
-  <a class="footer__logo hit t-brand-lg" href="/" aria-label={site.name}>{site.name}</a>
-  <nav class="footer__nav t-footer" aria-label="Legal">
-    {links.map((link) => <a class="footer__link link-line" href={link.href}>{link.label}</a>)}
-  </nav>
-  <p class="footer__credit t-footer">©{new Date().getFullYear()} <a class="link-line" href={credit.href}>{credit.label}</a></p>
+<footer class="footer on-dark">
+  <div class="container">
+    <div class="footer__top">
+      <div class="stack gap-16 footer__brand">
+        <a href="/" class="wordmark wordmark--light footer__mark">Layer<span>line</span></a>
+        <p class="body-m">Made to order in Toronto. Local pickup in the east end, shipping across Canada.</p>
+      </div>
+      <nav class="footer__cols" aria-label="Footer">
+        <div class="stack gap-12">
+          <p class="mono-s kicker">Shop</p>
+          <a href="/shop?type=in-stock">Ready to ship</a>
+          <a href="/shop?type=made-to-order">Personalise it</a>
+          <a href="/shop?category=gifts">Gifts</a>
+          <a href="/shop?category=garage">Garage</a>
+        </div>
+        <div class="stack gap-12">
+          <p class="mono-s kicker">Studio</p>
+          <a href="/custom">Custom builds</a>
+          <a href="/business">For business</a>
+          <a href="/about">About</a>
+          <a href="/#faq">FAQ</a>
+        </div>
+        <div class="stack gap-12">
+          <p class="mono-s kicker">Contact</p>
+          <a href={`mailto:${site.email}`}>{site.email}</a>
+          <a href={site.instagram} rel="noopener">Instagram</a>
+          <a href={site.etsy} rel="noopener">Etsy</a>
+        </div>
+      </nav>
+    </div>
+    <div class="footer__bottom mono-s">
+      <span>© {year} {site.name} · Toronto, ON</span>
+      <span class="row gap-16"><a href={site.legal.refund}>Shipping & returns</a><a href={site.legal.privacy}>Privacy</a><a href={site.legal.terms}>Terms</a></span>
+    </div>
+  </div>
 </footer>
 
 <style>
-  .footer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
-    padding: 2rem 0.75rem;
-    background-color: var(--color-bg-dark);
-  }
-
-  .footer__logo {
-    color: var(--color-accent);
-    transition: opacity var(--transition-base);
-  }
-
-  @media (min-width: 992px) and (hover: hover) and (pointer: fine) {
-    .footer__logo:hover {
-      opacity: 0.8;
-    }
-  }
-
-  .footer__nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.5rem 3rem;
-    color: var(--color-text-white);
-  }
-
-  .footer__credit {
-    color: var(--color-text-white);
-  }
-
-  /* On phones the legal links read like the size chips of the hero. */
-  @media (max-width: 767px) {
-    .footer {
-      gap: 1.5rem;
-      padding: 2.5rem var(--container-padding) 2rem;
-    }
-
-    .footer__nav {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      width: 100%;
-    }
-
-    .footer__link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 2.75rem;
-      padding-inline: 0.25rem;
-      border-radius: var(--radius-sm);
-      background: var(--color-bg-white);
-      color: var(--color-primary);
-      font-family: var(--font-heading);
-      font-size: 0.875rem;
-      text-align: center;
-      text-transform: uppercase;
-    }
-  }
+  .footer { background: var(--ink); padding-block: 72px 32px; }
+  .footer a { color: var(--paper); }
+  .footer a:hover { color: var(--accent); }
+  .footer__top { display: flex; justify-content: space-between; gap: 48px; flex-wrap: wrap; }
+  .footer__brand { max-width: 360px; }
+  .footer__mark { font-size: 3rem; }
+  .footer__cols { display: flex; gap: 80px; flex-wrap: wrap; }
+  .footer__bottom { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 56px; padding-top: 24px; border-top: 1px solid rgb(244 242 238 / 0.15); color: var(--grid); }
+  .footer__bottom a { color: var(--grid); }
+  @media (max-width: 767px) { .footer__cols { gap: 40px; } }
 </style>

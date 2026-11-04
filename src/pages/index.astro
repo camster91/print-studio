@@ -1,52 +1,277 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Hero from '../components/Hero.astro';
-import TrustBand from '../components/TrustBand.astro';
-import Features from '../components/Features.astro';
-import Details from '../components/Details.astro';
-import Reviews from '../components/Reviews.astro';
+import ProductCard from '../components/ProductCard.astro';
+import Photo from '../components/Photo.astro';
 import Faq from '../components/Faq.astro';
-import FinalCta from '../components/FinalCta.astro';
-import Footer from '../components/Footer.astro';
-import StickyBar from '../components/StickyBar.astro';
+import { products, filamentColours } from '../lib/products';
+import { faq } from '../data/faq';
+import reviewsData from '../data/reviews.json';
+import { site } from '../config/site';
 
-const faq = [
-  {
-    question: 'How does the shoe fit?',
-    answer: "The shoe fits true to size. We recommend ordering your usual size. If you're between sizes, consider sizing up.",
-  },
-  {
-    question: 'What are the shoes made of?',
-    answer: 'An engineered mesh upper, a lightweight foam midsole and a durable rubber outsole.',
-  },
-  {
-    question: 'Are they suitable for everyday wear?',
-    answer: "Yes. They're made for all-day wear, from errands to the office to weekend plans.",
-  },
-  {
-    question: 'Are the shoes comfortable for long periods?',
-    answer: 'Yes. Responsive cushioning and a lightweight build keep them comfortable from your first step to your last.',
-  },
-  {
-    question: 'How should I clean them?',
-    answer: "Wipe them with a soft cloth and mild soap, then let them air dry. Don't machine wash.",
-  },
+const featured = ['led-name-sign', 'lithophane-photo-box', 'qr-review-stand', 'm18-battery-mount-5-pack'].map((s) => products.find((p) => p.slug === s)!);
+const reviews = reviewsData.reviews as { quote: string; name: string; product: string; stars: number }[];
+const ledSigns = [
+  { title: 'Streamer name', cap: 'NAME SIGN, LIT, DARK DESK', glow: 'cyan' },
+  { title: 'Podcast ON AIR', cap: 'ON AIR BOX, LIT', glow: 'magenta' },
+  { title: 'Gamer tag', cap: 'GAMER TAG SIGN, LIT', glow: 'accent' },
+  { title: 'Desk LIVE light', cap: 'LIVE SIGN ON SHELF', glow: 'cyan' },
 ];
+const steps = [
+  ['01', 'Upload', 'Send a photo, logo, sketch or STL. No file? Just describe it.'],
+  ['02', 'Proof', 'We reply within 24 h with a price and a digital proof.'],
+  ['03', 'Print', 'Once you approve, we print it layer by layer in 5–7 days.'],
+  ['04', 'Pickup or ship', 'Grab it in Toronto or we ship anywhere in Canada.'],
+];
+const buildTypes = ['Personalised sign', 'QR / business stand', 'Lithophane', 'Replacement part', 'Organiser', 'Something else'];
+const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', 'Proof before we print', 'Made to order'];
 ---
 
-<BaseLayout
-  title="Sola Stride | Stride"
-  description="A versatile everyday sneaker designed to keep your feet comfortable, supported, and ready for whatever the day brings."
->
-  <main id="main-content">
-    <Hero />
-    <TrustBand />
-    <Features />
-    <Details />
-    <Reviews />
-    <Faq title="Questions? We've Got You Covered." items={faq} />
-    <FinalCta />
-  </main>
-  <Footer />
-  <StickyBar />
+<BaseLayout title={site.name} description="Personalised 3D prints made in Toronto: lithophane photo lamps, LED name signs, QR review stands, garage mounts and custom builds.">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="stack gap-24">
+        <p class="mono-m kicker">Toronto 3D print studio · Local pickup · Ships across Canada</p>
+        <h1 class="display-xl" data-split data-accent="you">Printed for you. Layer by layer.</h1>
+        <p class="body-l hero__lead">Personalised signs, photo lithophanes, QR stands for your shop and tough garage mounts. Or send us your idea and we'll design and print it.</p>
+        <div class="row gap-16 wrap">
+          <a href="/custom" class="btn btn--primary">Start a custom build</a>
+          <a href="/shop" class="btn btn--outline">Shop prints</a>
+        </div>
+        <dl class="hero__stats">
+          <div><dt class="mono-s">Day turnaround</dt><dd class="display-s">5–7</dd></div>
+          <div><dt class="mono-s">Quote reply</dt><dd class="display-s">24 h</dd></div>
+          <div><dt class="mono-s">Finest layer</dt><dd class="display-s">0.12 mm</dd></div>
+        </dl>
+      </div>
+      <div class="hero__visual" data-reveal="fade">
+        <Photo caption="LED name sign, lit, dark desk setup" tone="dark" class="hero__photo" eager />
+        <div class="hero__dim mono-s" aria-hidden="true"><span></span>← 200 mm →<span></span></div>
+        <span class="tag">0.2 mm · PLA matte · 3 h 40 m</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-label={marquee.join(', ')}>
+    <div class="marquee__track" data-marquee="28" aria-hidden="true">
+      {marquee.map((m) => <span class="display-s">{m}</span><span class="display-s">✦</span>)}
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <section class="section">
+    <div class="container">
+      <div class="section-head">
+        <div class="stack gap-16"><p class="mono-m kicker">01 / Shop</p><h2 class="display-l" data-reveal>Pick your print</h2></div>
+        <p class="body-m" data-reveal>Ready to ship, personalised, or fully custom. Every made-to-order piece gets a proof before we print.</p>
+      </div>
+      <div class="swiper cards-swiper" data-swiper="cards">
+        <div class="swiper-wrapper grid-4 cards-grid">
+          {featured.map((p, i) => <div class="swiper-slide" data-reveal data-delay={i * 0.08}><ProductCard product={p} /></div>)}
+        </div>
+      </div>
+      <div class="swiper-pagination mobile-only" data-pagination></div>
+      <div class="center-cta"><a href="/shop" class="btn btn--dark">See all {products.length} products</a></div>
+    </div>
+  </section>
+
+  <!-- LITHOPHANE -->
+  <section class="section section--surface">
+    <div class="container grid-2">
+      <div class="stack gap-24">
+        <p class="mono-m kicker">02 / Lithophanes</p>
+        <h2 class="display-l" data-reveal>Off, it's a sculpture. On, it's your photo.</h2>
+        <p class="body-l" data-reveal>A lithophane hides your photo in the thickness of the print. Light shines through the thin parts and your picture appears. Drag the handle to switch it on.</p>
+        <div class="row gap-12 wrap"><span class="tag">4-photo box</span><span class="tag">Pet memorial</span><span class="tag">Night light</span></div>
+        <a href="/products/lithophane-photo-box" class="btn btn--dark" style="width:fit-content">Upload your photos</a>
+      </div>
+      <div class="compare" data-compare>
+        <Photo caption="Unlit · white relief" class="compare__img" />
+        <div class="compare__top" data-compare-top><Photo caption="Lit · your photo appears" tone="warm" class="compare__img" /></div>
+        <input type="range" min="0" max="100" value="50" aria-label="Switch the light on and off" data-compare-range />
+        <span class="compare__handle" data-compare-handle aria-hidden="true"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section section--dark on-dark how">
+    <div class="container">
+      <div class="section-head">
+        <div class="stack gap-16"><p class="mono-m kicker">03 / How it works</p><h2 class="display-l" data-reveal>From idea to object in 4 steps</h2></div>
+      </div>
+      <ol class="grid-4 how__steps">
+        {steps.map(([n, t, d]) => <li class="how__step" data-step><span class="mono-m kicker">{n}</span><h3 class="display-s">{t}</h3><p class="body-m">{d}</p></li>)}
+      </ol>
+      <div class="how__bar" aria-hidden="true"><span data-progress></span></div>
+    </div>
+  </section>
+
+  <!-- LED SIGNS -->
+  <section class="section section--ink on-dark led" data-swiper-root>
+    <div class="container">
+      <div class="section-head">
+        <div class="stack gap-16"><p class="mono-m kicker">04 / LED signs</p><h2 class="display-l" data-reveal>Your name. <span class="glow">In lights.</span></h2></div>
+        <div class="row gap-12"><button class="arrow" data-prev aria-label="Previous">←</button><button class="arrow" data-next aria-label="Next">→</button></div>
+      </div>
+      <div class="swiper" data-swiper="rail">
+        <div class="swiper-wrapper">
+          {ledSigns.map((s) => (
+            <a href="/products/led-name-sign" class="swiper-slide led__slide">
+              <Photo caption={s.cap} tone="dark" class={`led__photo glow-${s.glow}`} />
+              <span class="row led__meta"><span class="label-l">{s.title}</span><span class="mono-s">From $45</span></span>
+            </a>
+          ))}
+        </div>
+      </div>
+      <div class="swiper-pagination" data-pagination></div>
+    </div>
+  </section>
+
+  <!-- BUSINESS -->
+  <section class="section">
+    <div class="container grid-2">
+      <div class="stack gap-24">
+        <p class="mono-m kicker">05 / For businesses</p>
+        <h2 class="display-l" data-reveal>More reviews. Faster payments.</h2>
+        <p class="body-l">Counter stands with your logo and a QR code for Google reviews, payments, Wi-Fi or your menu. Add NFC so customers just tap. Toronto shops get a free sample first.</p>
+        <table class="price-table">
+          <tbody>
+            <tr><td>1 QR stand</td><td>$25</td></tr>
+            <tr><td>3–9 stands</td><td>$20 each</td></tr><tr><td>10+ stands</td><td>$17 each</td></tr>
+            <tr><td>Logo setup (one time)</td><td>$15</td></tr>
+            <tr><td>NFC tap-to-review add-on</td><td>+$15</td></tr>
+          </tbody>
+        </table>
+        <div class="row gap-16 wrap"><a href="/business#sample" class="btn btn--primary">Get a free sample</a><a href="/business" class="btn btn--outline">Bulk & nameplates</a></div>
+      </div>
+      <Photo caption="QR stand on café counter, logo + Google review" style="aspect-ratio: 13/10" />
+    </div>
+  </section>
+
+  <!-- COLOURS -->
+  <section class="section section--surface" id="colours">
+    <div class="container">
+      <div class="section-head">
+        <div class="stack gap-16"><p class="mono-m kicker">06 / Colours</p><h2 class="display-l" data-reveal>Pick from the shelf</h2></div>
+        <p class="body-m">Matte, silk and translucent PLA plus tough PETG. Can't find yours? Send a hex code and we'll match it.</p>
+      </div>
+      <ul class="colours" data-stagger>
+        {Object.entries(filamentColours).map(([name, hex]) => <li><span class="colours__dot" style={`--c:${hex}`}></span><span class="label-m">{name}</span></li>)}
+      </ul>
+    </div>
+  </section>
+
+  {reviews.length > 0 && (
+    <section class="section" data-swiper-root>
+      <div class="container">
+        <div class="section-head"><div class="stack gap-16"><p class="mono-m kicker">07 / Reviews</p><h2 class="display-l">People like their prints</h2></div></div>
+        <div class="swiper" data-swiper="rail"><div class="swiper-wrapper">
+          {reviews.map((r) => <figure class="swiper-slide review"><p class="label-l accent">{'★'.repeat(r.stars)}</p><blockquote class="label-l">“{r.quote}”</blockquote><figcaption class="mono-s">{r.name} · {r.product}</figcaption></figure>)}
+        </div></div>
+      </div>
+    </section>
+  )}
+
+  <Faq items={faq} kicker="08 / FAQ" />
+
+  <!-- CUSTOM CTA -->
+  <section class="section section--accent cta">
+    <div class="container grid-2">
+      <div class="stack gap-24">
+        <p class="mono-m">09 / Custom builds</p>
+        <h2 class="display-xl cta__title" data-reveal>Got an idea? We'll print it.</h2>
+        <p class="body-l" style="color:var(--ink)">Replacement parts, gifts, organisers, signage, props. Tell us what you need and get a quote in 24 hours.</p>
+      </div>
+      <form class="cta__form" action="/custom" method="get">
+        <div class="row" style="justify-content:space-between"><span class="mono-s">Step 1 of 5</span><span class="mono-s" style="color:var(--muted)">What are we making?</span></div>
+        <div class="cta__bar"><span></span></div>
+        <fieldset class="cta__opts">
+          <legend class="sr-only">What are we making?</legend>
+          {buildTypes.map((t, i) => <label class="option"><input type="radio" name="type" value={t} checked={i === 2} /><span class="label-m">{t}</span></label>)}
+        </fieldset>
+        <button class="btn btn--dark btn--block">Next: upload files</button>
+      </form>
+    </div>
+  </section>
 </BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-compare]').forEach((el) => {
+    const range = el.querySelector<HTMLInputElement>('[data-compare-range]')!;
+    const top = el.querySelector<HTMLElement>('[data-compare-top]')!;
+    const handle = el.querySelector<HTMLElement>('[data-compare-handle]')!;
+    const set = () => { top.style.clipPath = `inset(0 0 0 ${range.value}%)`; handle.style.left = `${range.value}%`; };
+    range.addEventListener('input', set);
+    set();
+  });
+</script>
+
+<style>
+  .hero { padding-block: 72px 96px; }
+  .hero__grid { display: grid; grid-template-columns: 1.05fr 1fr; gap: 64px; align-items: center; }
+  .hero__lead { max-width: 560px; }
+  .hero__stats { display: flex; gap: 40px; padding-top: 16px; }
+  .hero__stats div { display: flex; flex-direction: column-reverse; gap: 4px; }
+  .hero__stats dt { color: var(--muted); }
+  .hero__visual { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  :global(.hero__photo) { width: 100%; aspect-ratio: 1; border-radius: 24px; }
+  .hero__dim { display: flex; align-items: center; gap: 12px; width: 100%; }
+  .hero__dim span { flex: 1; height: 1px; background: var(--ink); }
+  .marquee { background: var(--accent); overflow: hidden; padding-block: 20px; }
+  .marquee__track { display: flex; gap: 40px; width: max-content; padding-left: 40px; }
+  .marquee__track .display-s { color: var(--ink); white-space: nowrap; }
+  .cards-grid { display: grid; }
+  .center-cta { display: flex; justify-content: center; margin-top: 48px; }
+  .mobile-only { display: none; }
+  .compare { position: relative; aspect-ratio: 5 / 4; border-radius: 24px; overflow: hidden; }
+  :global(.compare__img) { position: absolute !important; inset: 0; border-radius: 0 !important; height: 100%; }
+  .compare__top { position: absolute; inset: 0; }
+  .compare input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: ew-resize; z-index: 2; }
+  .compare__handle { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: var(--accent); z-index: 1; pointer-events: none; }
+  .compare__handle::after { content: '⇆'; position: absolute; top: 50%; left: 50%; translate: -50% -50%; width: 44px; height: 44px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-weight: 700; }
+  .compare:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 4px; }
+  .how__steps { counter-reset: none; }
+  .how__step { display: flex; flex-direction: column; gap: 16px; padding: 28px; border-radius: 16px; border: 1px solid rgb(244 242 238 / 0.18); transition: border-color 300ms, background 300ms; }
+  .how__step:global(.is-lit) { border-color: var(--accent); background: rgb(255 91 31 / 0.06); }
+  .how__bar { margin-top: 40px; height: 4px; background: rgb(244 242 238 / 0.15); }
+  .how__bar span { display: block; height: 100%; background: var(--accent); transform-origin: left; }
+  .glow { color: var(--glow-cyan); text-shadow: 0 0 28px rgb(61 245 232 / 0.55); }
+  .arrow { width: 56px; height: 56px; border-radius: 50%; border: 1.5px solid rgb(244 242 238 / 0.4); color: var(--paper); font-size: 1.25rem; }
+  .arrow:hover { border-color: var(--accent); color: var(--accent); }
+  .led__slide { display: flex; flex-direction: column; gap: 16px; color: var(--paper); }
+  :global(.led__photo) { aspect-ratio: 7 / 5; }
+  :global(.glow-cyan) { box-shadow: inset 0 0 60px rgb(61 245 232 / 0.35); }
+  :global(.glow-magenta) { box-shadow: inset 0 0 60px rgb(255 61 168 / 0.35); }
+  :global(.glow-accent) { box-shadow: inset 0 0 60px rgb(255 91 31 / 0.35); }
+  .led__meta { justify-content: space-between; }
+  .led :global(.swiper-pagination), .section :global(.swiper-pagination) { position: static; margin-top: 24px; text-align: left; }
+  :global(.swiper-pagination-bullet) { background: var(--grid); opacity: 1; }
+  :global(.swiper-pagination-bullet-active) { background: var(--accent); width: 24px; border-radius: 4px; }
+  .price-table { width: 100%; border-collapse: collapse; }
+  .price-table td { padding-block: 16px; border-bottom: 1px solid var(--grid); font-size: 1.0625rem; }
+  .price-table td:last-child { text-align: right; font-family: var(--font-mono-stack); }
+  .colours { display: grid; grid-template-columns: repeat(10, 1fr); gap: 16px; }
+  .colours li { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+  .colours__dot { width: 96px; height: 96px; max-width: 100%; aspect-ratio: 1; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 2px var(--grid); }
+  .review { background: var(--surface); border-radius: var(--r-card); padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+  .cta__title { color: var(--surface) !important; }
+  .cta .mono-m { color: var(--ink); }
+  .cta__form { background: var(--surface); border-radius: var(--r-panel); padding: 32px; display: flex; flex-direction: column; gap: 20px; }
+  .cta__bar { height: 4px; background: var(--grid); }
+  .cta__bar span { display: block; width: 20%; height: 100%; background: var(--accent); }
+  .cta__opts { border: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 991px) {
+    .hero__grid { grid-template-columns: 1fr; }
+    .colours { grid-template-columns: repeat(5, 1fr); }
+  }
+  @media (max-width: 767px) {
+    .hero { padding-block: 32px 56px; }
+    .hero__stats { gap: 24px; }
+    .cards-grid { display: flex; gap: 0; }
+    .mobile-only { display: block; }
+    .colours__dot { width: 56px; height: 56px; }
+    .cta__opts { grid-template-columns: 1fr; }
+  }
+</style>

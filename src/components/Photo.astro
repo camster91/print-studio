@@ -1,0 +1,27 @@
+---
+/**
+ * Product/lifestyle photo. Until real photos exist it renders a labelled placeholder,
+ * matching the Figma prototype. Pass `src` once the shoot is done.
+ */
+interface Props {
+  caption: string;
+  src?: string;
+  alt?: string;
+  tone?: 'default' | 'dark' | 'warm';
+  class?: string;
+  style?: string;
+  eager?: boolean;
+}
+const { caption, src, alt = caption, tone = 'default', class: cls = '', style, eager = false } = Astro.props;
+---
+
+<div class:list={['photo', tone !== 'default' && `photo--${tone}`, cls]} style={style}>
+  {
+    src ? (
+      <img src={src} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+    ) : (
+      <span class="photo__caption" role="img" aria-label={`Photo coming soon: ${alt}`}>Photo · {caption}</span>
+    )
+  }
+  <slot />
+</div>

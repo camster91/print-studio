@@ -1,0 +1,115 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { products, categories } from '../lib/products';
+
+const ways = [
+  { badge: 'in-stock', label: 'In stock', title: 'Ready to ship', text: 'Printed and on the shelf. Ships in 1–2 days or pick up today.', href: '?type=in-stock', cta: 'Shop in-stock' },
+  { badge: 'made-to-order', label: 'Made to order', title: 'Personalise it', text: 'Add a name, photo or colour. Made in 5–7 days after your proof.', href: '?type=made-to-order', cta: 'Shop personalised' },
+  { badge: 'custom', label: 'Custom', title: 'Custom build', text: 'Anything else. Send a photo, sketch or file. Quote in 24 hours.', href: '/custom', cta: 'Start a custom build', dark: true },
+];
+---
+
+<BaseLayout title="Shop" description="Shop 3D printed gifts, LED signs, lithophanes, desk and garage gear. Ready to ship or personalised, made in Toronto.">
+  <section class="container shop-head">
+    <div class="stack gap-16">
+      <p class="mono-m kicker">Shop</p>
+      <h1 class="display-l" data-split>Printed in Toronto</h1>
+    </div>
+    <p class="body-l">Grab something ready to ship, personalise a favourite, or ask us to make something new.</p>
+  </section>
+
+  <section class="container grid-3 ways">
+    {ways.map((w) => (
+      <a href={w.href} class:list={['way', w.dark && 'way--dark on-dark']} data-reveal>
+        <span class={`badge badge--${w.badge}`}>{w.label}</span>
+        <h2 class="display-s">{w.title}</h2>
+        <p class="body-m">{w.text}</p>
+        <span class="label-m way__cta">{w.cta} →</span>
+      </a>
+    ))}
+  </section>
+
+  <div class="filters" data-filters>
+    <div class="container filters__inner">
+      <div class="row gap-8 wrap" role="group" aria-label="Filter by type">
+        <button class="chip" data-filter="type" data-value="" aria-pressed="true">All</button>
+        <button class="chip" data-filter="type" data-value="in-stock" aria-pressed="false">Ready to ship</button>
+        <button class="chip" data-filter="type" data-value="made-to-order" aria-pressed="false">Personalise it</button>
+      </div>
+      <span class="filters__sep" aria-hidden="true"></span>
+      <div class="row gap-8 wrap" role="group" aria-label="Filter by category">
+        {Object.entries(categories).map(([k, v]) => <button class="chip" data-filter="category" data-value={k} aria-pressed="false">{v}</button>)}
+      </div>
+      <p class="mono-s filters__count" aria-live="polite"><span data-count>{products.length}</span> products</p>
+    </div>
+  </div>
+
+  <section class="container section shop-grid-wrap">
+    <div class="grid-4 shop-grid" data-grid>
+      {products.map((p) => <ProductCard product={p} />)}
+      <div class="custom-tile on-dark" data-always>
+        <span class="badge badge--custom">Custom</span>
+        <p class="display-m custom-tile__title">Don't see it? We'll print it.</p>
+        <p class="body-m" style="color:var(--ink)">Parts, props, organisers, signs. Quote in 24 hours.</p>
+        <a href="/custom" class="btn btn--dark">Start a custom build</a>
+      </div>
+    </div>
+    <p class="body-m empty" data-empty hidden>Nothing here yet. <a href="/custom" style="text-decoration:underline">Ask for a custom build</a>.</p>
+  </section>
+</BaseLayout>
+
+<script>
+  const params = new URLSearchParams(location.search);
+  const state: Record<string, string> = { type: params.get('type') ?? '', category: params.get('category') ?? '' };
+  const cards = [...document.querySelectorAll<HTMLElement>('[data-grid] > .card')];
+  const count = document.querySelector('[data-count]')!;
+  const empty = document.querySelector<HTMLElement>('[data-empty]')!;
+  function apply() {
+    let n = 0;
+    cards.forEach((c) => {
+      const show = (!state.type || c.dataset.type === state.type) && (!state.category || c.dataset.category === state.category);
+      c.hidden = !show;
+      if (show) n++;
+    });
+    count.textContent = String(n);
+    empty.hidden = n > 0;
+    document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(state[b.dataset.filter!] === b.dataset.value)));
+    const q = new URLSearchParams(Object.entries(state).filter(([, v]) => v));
+    history.replaceState(null, '', q.size ? `?${q}` : location.pathname);
+  }
+  document.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) =>
+    b.addEventListener('click', () => {
+      const key = b.dataset.filter!;
+      state[key] = state[key] === b.dataset.value && key === 'category' ? '' : b.dataset.value!;
+      apply();
+    }),
+  );
+  apply();
+</script>
+
+<style>
+  .shop-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; padding-block: 64px 40px; }
+  .shop-head .body-l { max-width: 420px; }
+  .way { display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: var(--r-card); background: var(--surface); }
+  .way--dark { background: var(--ink); }
+  .way--dark .way__cta { color: var(--accent); }
+  .ways { margin-bottom: 40px; }
+  .filters { position: sticky; top: 73px; z-index: 30; background: var(--paper); border-block: 1px solid var(--grid); }
+  .filters__inner { display: flex; align-items: center; gap: 12px; padding-block: 16px; flex-wrap: wrap; }
+  .filters__sep { width: 1px; height: 28px; background: var(--grid); }
+  .filters__count { margin-left: auto; color: var(--muted); }
+  .shop-grid-wrap { padding-top: 40px; }
+  .card[hidden] { display: none; }
+  .custom-tile { display: flex; flex-direction: column; justify-content: space-between; gap: 16px; padding: 28px; border-radius: var(--r-card); background: var(--accent); }
+  .custom-tile__title { color: var(--surface); }
+  .custom-tile .btn { width: fit-content; }
+  @media (max-width: 767px) {
+    .shop-head { flex-direction: column; align-items: flex-start; padding-block: 32px 24px; }
+    .filters { top: 61px; }
+    .filters__inner { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; }
+    .filters__inner > div { flex-wrap: nowrap; }
+    .filters__count { display: none; }
+    .chip { white-space: nowrap; }
+  }
+</style>

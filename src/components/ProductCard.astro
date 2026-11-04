@@ -1,0 +1,21 @@
+---
+import Photo from './Photo.astro';
+import { type Product, audience, typeLabel, blurbs, priceLabel, specLabel } from '../lib/products';
+
+interface Props { product: Product; class?: string; showSpec?: boolean }
+const { product: p, class: cls = '', showSpec = true } = Astro.props;
+---
+
+<a href={`/products/${p.slug}`} class:list={['card', cls]} data-category={p.category} data-type={p.type}>
+  <Photo caption={p.name} src={p.images?.[0]} tone={p.led ? 'warm' : 'default'} />
+  <div class="card__body">
+    <span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span>
+    <span class="mono-s kicker">{audience[p.category]}</span>
+    <h3 class="card__title">{p.name}</h3>
+    <p class="body-s">{blurbs[p.slug]}{p.fits && <span class="sr-only"> Fits {p.fits}.</span>}</p>
+    <div class="card__row">
+      <span class="card__price">{priceLabel(p)}</span>
+      {showSpec && <span class="tag">{specLabel(p)}</span>}
+    </div>
+  </div>
+</a>

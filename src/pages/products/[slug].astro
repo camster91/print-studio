@@ -1,0 +1,268 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Photo from '../../components/Photo.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { products, type Product, typeLabel, audience, blurbs, money, filamentColours } from '../../lib/products';
+import { site } from '../../config/site';
+
+export function getStaticPaths() {
+  return products.map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
+}
+
+const { product: p } = Astro.props as { product: Product };
+const mto = p.type === 'made-to-order';
+const colours = p.options.frameColour ?? p.options.colour ?? [];
+const colourKey = p.options.frameColour ? 'Frame colour' : 'Colour';
+const startSize = p.options.size?.find((s) => s.price === p.price) ?? p.options.size?.[0];
+const startPrice = startSize?.price ?? p.price;
+const shots = p.led ? ['Hero, lit', 'Unlit, daylight', 'Detail of layers', 'In hand, for scale', 'In use'] : ['Hero', 'Detail of layers', 'In hand, for scale', 'In use', 'All colours'];
+const related = products.filter((x) => x.slug !== p.slug && (x.category === p.category || x.type === p.type)).slice(0, 4);
+const photoCount = p.options.photos ?? 0;
+const needsLogo = p.options.logo;
+const details = [
+  { q: 'Details', a: `${p.material}${p.colours > 1 ? `, ${p.colours} colours` : ''}. About ${p.printHours} hours of printing per piece.${p.fits ? ` Fits ${p.fits}. Not affiliated with or endorsed by the brand.` : ''}${p.led ? ' Includes a certified USB LED and cable; use any USB phone charger.' : ''}${p.credit ? ` ${p.credit}.` : ''}` },
+  { q: 'Timing', a: mto ? `Made to order. We email a proof within 24 hours and print in 5–7 business days after you approve.${site.holidayCutoff ? ` Order by ${site.holidayCutoff} for Christmas.` : ''}` : 'In stock. Ships in 1–2 business days, or pick up in Toronto.' },
+  { q: 'Shipping & pickup', a: `Free pickup in Toronto's east end. Canada Post tracked shipping $${site.shippingCanada}, free over $${site.freeShippingFrom}.` },
+  { q: 'Care', a: p.material === 'PLA' ? 'Indoor use. Keep out of hot cars and direct sun. Wipe with a dry or damp cloth.' : 'Handles garages and sheds. Wipe clean with a damp cloth.' },
+  ...(p.safety ? [{ q: 'Safety', a: p.safety }] : []),
+];
+---
+
+<BaseLayout title={p.name} description={`${blurbs[p.slug]} ${typeLabel[p.type]} from ${money(startPrice)} CAD. Made in Toronto.`}>
+  <div class="container crumbs mono-s"><a href="/shop">Shop</a> / <a href={`/shop?category=${p.category}`}>{audience[p.category].replace('For ', '')}</a> / {p.name}</div>
+
+  <section class="container pdp">
+    <div class="pdp__gallery">
+      <div class="swiper gallery" data-swiper="gallery">
+        <div class="swiper-wrapper">
+          {shots.map((s, i) => <div class="swiper-slide"><Photo caption={`${p.name} — ${s}`} src={p.images?.[i]} tone={p.led && i === 0 ? 'warm' : 'default'} class="gallery__photo" eager={i === 0} /></div>)}
+        </div>
+      </div>
+      <div class="thumbs">
+        {shots.map((s, i) => <button data-thumb aria-label={`Show photo ${i + 1}: ${s}`}><Photo caption={s} src={p.images?.[i]} class="thumb" /></button>)}
+      </div>
+    </div>
+
+    <form class="buy" data-buy data-slug={p.slug} data-name={p.name} data-type={p.type} data-base={p.price}
+      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0}>
+      <div class="row gap-12 wrap"><span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span><span class="mono-s kicker">{audience[p.category]}</span></div>
+      <h1 class="display-l">{p.name}</h1>
+      <p class="row gap-12" style="align-items:baseline"><span class="display-m" data-price>{money(startPrice)}</span><span class="body-m">CAD · free Toronto pickup</span></p>
+      <p class="body-l">{blurbs[p.slug]}{p.fits && ` Fits ${p.fits}.`}</p>
+
+      {p.options.size && (
+        <fieldset class="opt"><legend class="mono-s">Size</legend>
+          <div class="row gap-8 wrap">{p.options.size.map((s) => <label class="chip"><input type="radio" name="Size" value={s.label} checked={s === startSize} />{s.label} · {money(s.price)}</label>)}</div>
+        </fieldset>
+      )}
+
+      {colours.length > 0 && (
+        <fieldset class="opt"><legend class="mono-s">{colourKey}: <span data-colour-name>{colours[0]}</span></legend>
+          <div class="row gap-12 wrap">{colours.map((c, i) => {
+            const parts = c.split(' / ');
+            const bg = parts.length > 1 ? `linear-gradient(135deg, ${filamentColours[parts[0]] ?? '#ccc'} 50%, ${filamentColours[parts[1]] ?? '#eee'} 50%)` : (filamentColours[c] ?? '#ccc');
+            return <label class="swatch" style={`--c:${bg}`} title={c}><input type="radio" name={colourKey} value={c} checked={i === 0} aria-label={c} /></label>;
+          })}</div>
+        </fieldset>
+      )}
+
+      {p.options.text && (
+        <div class="field opt"><label for="opt-text">Your text</label><input id="opt-text" class="input" name="Text" maxlength="40" required placeholder={p.options.text} /></div>
+      )}
+      {p.options.place && (
+        <div class="field opt"><label for="opt-place">Lake or area</label><input id="opt-place" class="input" name="Place" maxlength="60" required placeholder="e.g. Lake Muskoka, Bracebridge" /></div>
+      )}
+      {p.options.drawer && (
+        <div class="field opt"><label for="opt-drawer">Drawer inside size (mm)</label><input id="opt-drawer" class="input" name="Drawer" maxlength="60" required placeholder="e.g. 520 × 380 × 70" /></div>
+      )}
+      {p.options.link && (
+        <div class="field opt"><label for="opt-link">Where should the QR go?</label><input id="opt-link" class="input" name="Link" maxlength="60" required placeholder="Google review, booking or menu link" /></div>
+      )}
+
+      {(photoCount > 0 || needsLogo) && (
+        <fieldset class="opt" data-uploads data-max={photoCount || 1}>
+          <legend class="mono-s row" style="justify-content:space-between;width:100%">
+            <span>{needsLogo ? 'Your logo (SVG, PNG or PDF)' : `Your ${photoCount} photo${photoCount > 1 ? 's' : ''}`}</span>
+            <span class="kicker" data-upload-count>0 of {photoCount || 1} added</span>
+          </legend>
+          <div class="slots">
+            {Array.from({ length: photoCount || 1 }).map((_, i) => (
+              <label class="slot"><input type="file" accept={needsLogo ? '.svg,.png,.pdf,image/*' : 'image/*'} data-slot={i} /><span class="label-m">+ Add</span></label>
+            ))}
+          </div>
+          <p class="body-s" data-upload-msg>Bright, close-up photos work best. You can also email them after checkout.</p>
+          <label class="check"><input type="checkbox" name="rights" required /> I own these photos/logos or have permission to use them.</label>
+        </fieldset>
+      )}
+
+      {(p.addOns ?? []).map((a) => (
+        <label class="check"><input type="checkbox" data-addon={a.label} /> Add {a.label} (+{money(a.price)})</label>
+      ))}
+      {mto && <label class="check"><input type="checkbox" data-gift /> Add a gift note (free)</label>}
+      <div class="field opt" data-gift-field hidden><label for="gift">Gift note</label><textarea id="gift" class="textarea" name="Gift note" maxlength="200"></textarea></div>
+
+      <div class="buy__row">
+        <div class="qty" role="group" aria-label="Quantity"><button type="button" data-q="-1" aria-label="One fewer">–</button><output data-qty>1</output><button type="button" data-q="1" aria-label="One more">+</button></div>
+        <button class="btn btn--primary buy__add" data-add>Add to bag · <span data-total>{money(startPrice)}</span></button>
+      </div>
+      {p.bulk && <p class="mono-s kicker">{p.bulk.map((b) => `${b.min}+ ${money(b.price)} each`).join(' · ')}{p.setupFee ? ` · logo setup ${money(p.setupFee)} once` : ''}</p>}
+      {mto && site.holidayCutoff && <p class="note body-s">🎄 Order by {site.holidayCutoff} for Christmas. We email a proof before we print.</p>}
+      <div class="row gap-8 wrap">{(mto ? ['Proof before print', 'Made in 5–7 days'] : ['Ships in 1–2 days', 'Toronto pickup']).concat(p.led ? ['Certified USB LED'] : []).map((t) => <span class="tag">{t}</span>)}</div>
+      <p class="body-s buy__error" role="alert" data-error></p>
+
+      <div class="acc">
+        {details.map((d, i) => <details open={i === 0}><summary class="label-l">{d.q}<span aria-hidden="true">+</span></summary><p class="body-s">{d.a}</p></details>)}
+      </div>
+    </form>
+  </section>
+
+  <section class="section section--dark on-dark">
+    <div class="container how">
+      <div class="stack gap-16"><p class="mono-m kicker">How it works</p><h2 class="display-m">{mto ? 'Proof first. Then we print.' : 'Printed, packed, ready.'}</h2></div>
+      {(mto ? [['01', 'Order', 'Choose your options and check out with Stripe.'], ['02', 'We proof', 'You get a digital preview by email within 24 hours.'], ['03', 'We print', '5–7 days after you approve. Pickup or ship.']] : [['01', 'Order', 'Check out securely with Stripe.'], ['02', 'Packed', 'Ships in 1–2 business days.'], ['03', 'Or pick up', 'Free pickup in Toronto’s east end.']]).map(([n, t, d]) => (
+        <div class="how__card"><span class="mono-m kicker">{n}</span><h3 class="display-s">{t}</h3><p class="body-m">{d}</p></div>
+      ))}
+    </div>
+  </section>
+
+  <section class="section container">
+    <h2 class="display-m" style="margin-bottom:40px">You might also like</h2>
+    <div class="grid-4">{related.map((r) => <ProductCard product={r} />)}</div>
+  </section>
+
+  <div class="sticky-buy">
+    <div><p class="label-l" data-total-sticky>{money(startPrice)}</p>{mto && site.holidayCutoff && <p class="mono-s kicker">Order by {site.holidayCutoff}</p>}</div>
+    <button class="btn btn--primary" data-add-sticky>Add to bag</button>
+  </div>
+</BaseLayout>
+
+<script>
+  import { addToCart, trackAdd } from '../../lib/cart';
+  import { money } from '../../lib/products';
+  import { site } from '../../config/site';
+
+  const form = document.querySelector<HTMLFormElement>('[data-buy]')!;
+  const d = form.dataset;
+  const sizes: { label: string; price: number }[] = JSON.parse(d.sizes!);
+  const addons: { label: string; price: number }[] = JSON.parse(d.addons!);
+  const bulk: { min: number; price: number }[] = JSON.parse(d.bulk!);
+  const setup = Number(d.setup);
+  let qty = 1;
+  const files: (string | null)[] = [];
+
+  const unit = () => {
+    const size = sizes.find((s) => s.label === (form.elements.namedItem('Size') as RadioNodeList | null)?.value);
+    let u = size ? size.price : Number(d.base);
+    if (!size && bulk.length) { const t = [...bulk].sort((a, b) => b.min - a.min).find((b) => qty >= b.min); if (t) u = t.price; }
+    form.querySelectorAll<HTMLInputElement>('[data-addon]').forEach((a) => { if (a.checked) u += addons.find((x) => x.label === a.dataset.addon)?.price ?? 0; });
+    return u;
+  };
+  const repaint = () => {
+    const u = unit();
+    const total = u * qty + (setup && files.some(Boolean) ? setup : 0);
+    form.querySelector('[data-price]')!.textContent = money(u);
+    form.querySelector('[data-total]')!.textContent = money(total);
+    form.querySelector('[data-qty]')!.textContent = String(qty);
+    document.querySelector('[data-total-sticky]')!.textContent = money(total);
+    const colour = form.querySelector<HTMLInputElement>('.swatch input:checked');
+    const name = form.querySelector('[data-colour-name]');
+    if (colour && name) name.textContent = colour.value;
+  };
+  form.addEventListener('change', repaint);
+  form.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) => b.addEventListener('click', () => { qty = Math.max(1, Math.min(50, qty + Number(b.dataset.q))); repaint(); }));
+  form.querySelector<HTMLInputElement>('[data-gift]')?.addEventListener('change', (e) => { (form.querySelector('[data-gift-field]') as HTMLElement).hidden = !(e.target as HTMLInputElement).checked; });
+
+  // Uploads go straight to the Worker (R2). If uploads aren't set up, the order still works.
+  const uploads = form.querySelector<HTMLElement>('[data-uploads]');
+  uploads?.querySelectorAll<HTMLInputElement>('input[type=file]').forEach((input) => {
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0];
+      const slot = input.closest('.slot') as HTMLElement;
+      const i = Number(input.dataset.slot);
+      const msg = uploads.querySelector('[data-upload-msg]')!;
+      if (!file) return;
+      if (file.size > 25 * 1024 * 1024) { msg.textContent = 'That file is over 25 MB. Please pick a smaller one.'; return; }
+      slot.style.backgroundImage = file.type.startsWith('image/') ? `url(${URL.createObjectURL(file)})` : '';
+      slot.dataset.state = 'uploading';
+      try {
+        const body = new FormData(); body.append('file', file);
+        const res = await fetch(site.api.upload, { method: 'POST', body });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error);
+        files[i] = data.key;
+        slot.dataset.state = 'done';
+      } catch {
+        files[i] = null;
+        slot.dataset.state = 'local';
+        msg.textContent = 'Upload isn’t available right now. Add to bag anyway and email your files after checkout.';
+      }
+      uploads.querySelector('[data-upload-count]')!.textContent = `${uploads.querySelectorAll('.slot[data-state]').length} of ${uploads.dataset.max} added`;
+      repaint();
+    });
+  });
+
+  const add = (e: Event) => {
+    e.preventDefault();
+    const err = form.querySelector('[data-error]')!;
+    err.textContent = '';
+    if (!form.reportValidity()) return;
+    const options: Record<string, string> = {};
+    new FormData(form).forEach((v, k) => { if (typeof v === 'string' && v && k !== 'rights') options[k] = v; });
+    form.querySelectorAll<HTMLInputElement>('[data-addon]').forEach((a) => (options[a.dataset.addon!] = a.checked ? 'Yes' : 'No'));
+    const item = { slug: d.slug!, name: d.name!, price: unit() + (setup && files.some(Boolean) ? setup / qty : 0), quantity: qty, options, files: files.filter(Boolean) as string[], madeToOrder: d.type === 'made-to-order' };
+    addToCart(item);
+    trackAdd(item);
+    window.dispatchEvent(new Event('cart:open'));
+  };
+  form.addEventListener('submit', add);
+  document.querySelector('[data-add-sticky]')!.addEventListener('click', (e) => { form.scrollIntoView({ behavior: 'smooth' }); add(e); });
+  repaint();
+</script>
+
+<style>
+  .crumbs { padding-block: 28px; color: var(--muted); }
+  .crumbs a:hover { color: var(--ink); }
+  .pdp { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 64px; padding-bottom: 96px; align-items: start; }
+  .pdp__gallery { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+  .gallery { overflow: hidden; border-radius: 24px; width: 100%; }
+  :global(.gallery__photo) { aspect-ratio: 1; border-radius: 0 !important; }
+  .thumbs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+  .thumbs button { border-radius: 14px; overflow: hidden; outline-offset: 2px; }
+  .thumbs button[aria-current='true'] { outline: 2px solid var(--accent); }
+  :global(.thumb) { aspect-ratio: 1; border-radius: 14px !important; }
+  .thumbs :global(.photo__caption) { font-size: 0.5rem; padding: 4px; }
+  .buy { display: flex; flex-direction: column; gap: 22px; }
+  .opt { border: 0; display: flex; flex-direction: column; gap: 12px; }
+  .opt legend { margin-bottom: 12px; }
+  .slots { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .slot { aspect-ratio: 1; border-radius: 14px; border: 1.5px dashed var(--ink); display: grid; place-items: center; cursor: pointer; background-size: cover; background-position: center; position: relative; }
+  .slot input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .slot[data-state] { border-style: solid; border-color: var(--grid); }
+  .slot[data-state] span { display: none; }
+  .slot[data-state='uploading']::after { content: 'Uploading…'; font-size: 0.75rem; background: rgb(255 255 255 / 0.85); padding: 4px 8px; border-radius: 6px; }
+  .slot[data-state='done']::after { content: '✓'; position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; border-radius: 50%; background: var(--fil-teal); display: grid; place-items: center; font-size: 0.75rem; }
+  .buy__row { display: flex; gap: 12px; align-items: center; }
+  .qty { display: flex; align-items: center; border: 1.5px solid var(--grid); border-radius: 999px; }
+  .qty button, .qty output { width: 48px; height: 52px; display: grid; place-items: center; font-weight: 600; }
+  .buy__add { flex: 1; }
+  .note { padding: 14px 16px; border-radius: 12px; background: var(--surface); color: var(--ink); }
+  .buy__error { color: #b42318; }
+  .acc details { border-top: 1px solid var(--grid); padding-block: 18px; }
+  .acc summary { display: flex; justify-content: space-between; cursor: pointer; list-style: none; }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary span { color: var(--accent-ink); }
+  .acc p { margin-top: 10px; }
+  .how { display: grid; grid-template-columns: 380px repeat(3, 1fr); gap: 16px; align-items: start; }
+  .how__card { display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: 18px; border: 1px solid rgb(244 242 238 / 0.18); }
+  .sticky-buy { display: none; }
+  @media (max-width: 991px) {
+    .pdp { grid-template-columns: 1fr; gap: 24px; }
+    .pdp__gallery { position: static; }
+    .how { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 767px) {
+    .thumbs { display: none; }
+    .slots { grid-template-columns: repeat(4, 1fr); }
+    .sticky-buy { display: flex; position: sticky; bottom: 0; z-index: 30; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 16px 20px; background: var(--surface); border-top: 1px solid var(--grid); }
+  }
+</style>

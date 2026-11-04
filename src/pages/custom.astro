@@ -1,0 +1,394 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { filamentColours } from '../lib/products';
+import { site } from '../config/site';
+
+const types = [
+  { v: 'Personalised sign', from: 35, d: 'Names, logos, LED.' },
+  { v: 'QR / business stand', from: 25, d: 'Reviews, payments, Wi-Fi.' },
+  { v: 'Lithophane', from: 45, d: 'Your photos that glow.' },
+  { v: 'Replacement part', from: 25, d: 'Knobs, clips, brackets.' },
+  { v: 'Organiser', from: 25, d: 'Gridfinity, drawers, tools.' },
+  { v: 'Something else', from: 0, d: 'Tell us your idea.' },
+];
+const steps = ['What', 'Files', 'Size & colour', 'Budget & date', 'Contact'];
+const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+'];
+---
+
+<BaseLayout title="Custom build request" description="Tell us what to print. Upload a photo, sketch or 3D file and get a price and digital proof within 24 hours.">
+  <section class="container head">
+    <p class="mono-m kicker">Custom build request</p>
+    <h1 class="display-l">Tell us what to print</h1>
+    <p class="body-l">Takes about 3 minutes. You get a price and a digital proof within 24 hours. Nothing is charged until you approve.</p>
+  </section>
+
+  <div class="container">
+    <ol class="stepper" data-stepper>
+      {steps.map((s, i) => <li data-stepper-item><span class="stepper__bar"></span><span class="mono-s">0{i + 1}  {s}</span></li>)}
+    </ol>
+  </div>
+
+  <div class="container body">
+    <form class="card-form" data-build novalidate>
+      <!-- 1 -->
+      <fieldset class="step" data-step-panel="0">
+        <legend class="label-l">What are we making?</legend>
+        <p class="body-s">Pick the closest one. You can explain more on the next step.</p>
+        <div class="opts">
+          {types.map((t, i) => (
+            <label class="option"><input type="radio" name="type" value={t.v} data-from={t.from} required checked={i === 2} />
+              <span class="option__top"><span class="label-l">{t.v}</span><span class="mono-s">{t.from ? `From $${t.from}` : 'Quote'}</span></span>
+              <span class="body-s">{t.d}</span></label>
+          ))}
+        </div>
+      </fieldset>
+
+      <!-- 2 -->
+      <fieldset class="step" data-step-panel="1" hidden>
+        <legend class="label-l">Upload your files</legend>
+        <p class="body-s">Photos for lithophanes, a logo for stands and signs, a photo of the broken part next to a ruler, or a 3D file.</p>
+        <label class="drop" data-drop>
+          <input type="file" name="files" multiple accept="image/*,.svg,.pdf,.stl,.3mf,.step,.stp,.obj" data-files />
+          <span class="drop__icon" aria-hidden="true">↑</span>
+          <span class="label-l">Drop files here or browse</span>
+          <span class="mono-s">JPG · PNG · HEIC · SVG · PDF · STL · 3MF · STEP — up to 25 MB each, 10 files</span>
+        </label>
+        <ul class="files" data-file-list></ul>
+        <p class="tip body-s"><span class="mono-s kicker">Tip</span> Bright photos with faces close up make the best lithophanes. For parts, include a ruler or calipers in the photo.</p>
+        <div class="field"><label for="desc">Describe it {`(required if you have no file)`}</label><textarea id="desc" class="textarea" name="description" maxlength="2000" placeholder="e.g. A replacement knob for my dishwasher, about 3 cm wide. I can send measurements."></textarea></div>
+        <div class="field"><label for="ref">Reference link (optional)</label><input id="ref" class="input" type="url" name="reference" placeholder="Paste an Etsy, Amazon or MakerWorld link" /></div>
+        <label class="check"><input type="checkbox" name="rights" value="yes" required /> I own these photos and logos or have permission to use them.</label>
+      </fieldset>
+
+      <!-- 3 -->
+      <fieldset class="step" data-step-panel="2" hidden>
+        <legend class="label-l">Size</legend>
+        <div class="row gap-8 wrap">{['Small · ~80 mm', 'Medium · ~100 mm', 'Large · ~150 mm', 'Custom size', "I'll send measurements"].map((s, i) => <label class="chip"><input type="radio" name="size" value={s} checked={i === 1} />{s}</label>)}</div>
+        <div class="dims" data-dims hidden>
+          {['Width', 'Height', 'Depth'].map((d) => <div class="field"><label>{d} (mm)</label><input class="input" type="number" min="1" max="1000" name={d.toLowerCase()} inputmode="numeric" /></div>)}
+        </div>
+        <span class="label-l" style="margin-top:12px">Colour</span>
+        <div class="row gap-12 wrap">
+          {Object.entries(filamentColours).map(([n, c], i) => <label class="swatch" style={`--c:${c}`} title={n}><input type="radio" name="colour" value={n} aria-label={n} checked={i === 6} /></label>)}
+          <label class="chip"><input type="radio" name="colour" value="Let us choose" />Let us choose</label>
+        </div>
+        <div class="two">
+          <div class="field"><label for="hex">Brand colour (optional)</label><input id="hex" class="input" name="hex" placeholder="#FF5B1F" maxlength="7" /></div>
+          <div class="field"><label for="mat">Material</label><select id="mat" class="select input" name="material"><option>Auto (recommended)</option><option>PLA — indoor, best detail</option><option>PETG — tough, garage</option><option>ASA — heat, cars, outdoors</option><option>TPU — flexible</option></select></div>
+        </div>
+        <span class="label-l" style="margin-top:12px">Quantity</span>
+        <div class="row gap-16 wrap">
+          <div class="qty"><button type="button" data-q="-1" aria-label="One fewer">–</button><input class="qty__n" name="quantity" type="number" min="1" max="1000" value="1" aria-label="Quantity" /><button type="button" data-q="1" aria-label="One more">+</button></div>
+          <span class="tag">5+ save 10%</span><span class="tag">10+ save 15%</span>
+        </div>
+      </fieldset>
+
+      <!-- 4 -->
+      <fieldset class="step" data-step-panel="3" hidden>
+        {site.holidayCutoff && <p class="banner label-m">Holidays: order custom gifts by {site.holidayCutoff} to get them before Christmas.</p>}
+        <legend class="label-l">Budget</legend>
+        <p class="body-s">Helps us suggest the right size and finish. You still get an exact quote.</p>
+        <div class="row gap-8 wrap">{budgets.map((b, i) => <label class="chip"><input type="radio" name="budget" value={b} checked={i === 2} />{b}</label>)}</div>
+        <span class="label-l" style="margin-top:12px">When do you need it?</span>
+        <div class="opts opts--3">
+          {[['Flexible', 'Free', 'Standard 5–7 business days after you approve the proof.'], ['By a date', 'Pick a date', 'We’ll tell you if we can make it.'], ['Rush', '+25%', '2–3 business days after proof approval.']].map(([t, e, d], i) => (
+            <label class="option"><input type="radio" name="timing" value={t} checked={i === 0} /><span class="option__top"><span class="label-l">{t}</span><span class="mono-s">{e}</span></span><span class="body-s">{d}</span></label>
+          ))}
+        </div>
+        <div class="field" data-date hidden><label for="date">Needed by</label><input id="date" class="input" type="date" name="neededBy" /></div>
+        <span class="label-l" style="margin-top:12px">Design help</span>
+        <div class="opts opts--2">
+          <label class="option"><input type="radio" name="design" value="I have a file or photo" checked /><span class="option__top"><span class="label-l">I have a file or photo</span><span class="mono-s">$0</span></span><span class="body-s">We just print it. No design fee.</span></label>
+          <label class="option"><input type="radio" name="design" value="Design it for me" /><span class="option__top"><span class="label-l">Design it for me</span><span class="mono-s">From $25</span></span><span class="body-s">We model it from your sketch or measurements.</span></label>
+        </div>
+        <span class="label-l" style="margin-top:12px">Delivery</span>
+        <div class="opts opts--3">
+          {[['Toronto pickup', 'Free', 'Porch pickup, east end.'], ['Ship in Canada', `$${site.shippingCanada}`, 'Canada Post, tracked.'], ['United States', 'Ask', 'On request, duties included in the quote.']].map(([t, e, d], i) => (
+            <label class="option"><input type="radio" name="delivery" value={t} checked={i === 0} /><span class="option__top"><span class="label-l">{t}</span><span class="mono-s">{e}</span></span><span class="body-s">{d}</span></label>
+          ))}
+        </div>
+      </fieldset>
+
+      <!-- 5 -->
+      <fieldset class="step" data-step-panel="4" hidden>
+        <legend class="label-l">How do we reach you?</legend>
+        <p class="body-s">We reply with your price and proof within 24 hours.</p>
+        <div class="two">
+          <div class="field"><label for="n">Name</label><input id="n" class="input" name="name" required autocomplete="name" /></div>
+          <div class="field"><label for="e">Email</label><input id="e" class="input" type="email" name="email" required autocomplete="email" /></div>
+        </div>
+        <div class="two">
+          <div class="field"><label for="p">Phone (optional)</label><input id="p" class="input" type="tel" name="phone" autocomplete="tel" /></div>
+          <div class="field"><label for="pc">Postal code</label><input id="pc" class="input" name="postal" autocomplete="postal-code" maxlength="7" /></div>
+        </div>
+        <div class="field"><span class="field__label">Best way to reach you</span><div class="row gap-8 wrap">{['Email', 'Text', 'Phone call'].map((c, i) => <label class="chip"><input type="radio" name="contactBy" value={c} checked={i === 0} />{c}</label>)}</div></div>
+        <div class="review" data-review></div>
+        <label class="check"><input type="checkbox" name="noRefund" value="yes" required /> I understand custom items can't be refunded once printing starts.</label>
+        <label class="check"><input type="checkbox" name="newsletter" value="yes" /> Send me occasional news and new colours (optional).</label>
+        <input type="text" name="company_website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" />
+      </fieldset>
+
+      <p class="body-s err" role="alert" data-err></p>
+      <div class="nav-btns">
+        <button type="button" class="btn btn--outline btn--no-arrow" data-back hidden>Back</button>
+        <span class="mono-s muted" data-charge hidden>Nothing is charged yet</span>
+        <button type="submit" class="btn btn--primary" data-next>Next: upload files</button>
+      </div>
+    </form>
+
+    <aside class="summary on-dark" aria-label="Your request">
+      <p class="mono-s kicker">Your request</p>
+      <dl data-summary></dl>
+      <hr />
+      <p class="mono-s" style="color:var(--grid)">Estimate</p>
+      <p class="display-m" data-estimate>From $45</p>
+      <p class="body-s">Starting estimate only. Final price and a digital proof within 24 h. Minimum job ${site.minimumCustomJob}.</p>
+      <div class="row gap-8 wrap"><span class="tag">No charge till you approve</span><span class="tag">5–7 days</span></div>
+    </aside>
+  </div>
+
+  <section class="container thanks" data-thanks hidden>
+    <div class="thanks__tick" aria-hidden="true">✓</div>
+    <p class="mono-m kicker" data-thanks-id>Request sent</p>
+    <h2 class="display-xl">Got it. We're on it.</h2>
+    <p class="body-l" data-thanks-text>We'll email you with your price and a digital proof within 24 hours. Nothing is charged until you approve.</p>
+    <ol class="grid-3 thanks__next">
+      <li><span class="mono-m kicker">01</span><h3 class="display-s">Proof in 24 h</h3><p class="body-s">A price and a render or photo mockup in your inbox.</p></li>
+      <li><span class="mono-m kicker">02</span><h3 class="display-s">You approve</h3><p class="body-s">Reply "yes" or ask for one free change. Pay by Stripe invoice or e-Transfer.</p></li>
+      <li><span class="mono-m kicker">03</span><h3 class="display-s">We print</h3><p class="body-s">5–7 days. Pickup in Toronto or tracked shipping.</p></li>
+    </ol>
+    <div class="row gap-16 wrap" style="justify-content:center"><a href="/shop" class="btn btn--dark">Back to the shop</a><a href="/custom" class="btn btn--outline">Start another request</a></div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { submitQuote } from '../lib/quote';
+  import { lenis } from '../lib/motion';
+
+  const SAVE = 'layerline-build';
+  const form = document.querySelector<HTMLFormElement>('[data-build]')!;
+  const panels = [...form.querySelectorAll<HTMLFieldSetElement>('[data-step-panel]')];
+  const items = [...document.querySelectorAll<HTMLElement>('[data-stepper-item]')];
+  const next = form.querySelector<HTMLButtonElement>('[data-next]')!;
+  const back = form.querySelector<HTMLButtonElement>('[data-back]')!;
+  const err = form.querySelector<HTMLElement>('[data-err]')!;
+  const nextLabels = ['Next: upload files', 'Next: size & colour', 'Next: budget & date', 'Next: contact', 'Send my request'];
+  const fileInput = form.querySelector<HTMLInputElement>('[data-files]')!;
+  let files: File[] = [];
+  let step = 0;
+
+  // Prefill from ?type= (homepage step 1) and saved progress
+  try {
+    const saved = JSON.parse(localStorage.getItem(SAVE) ?? '{}');
+    for (const [k, v] of Object.entries(saved)) {
+      const els = form.querySelectorAll<HTMLInputElement>(`[name="${k}"]`);
+      els.forEach((el) => { if (el.type === 'radio' || el.type === 'checkbox') el.checked = el.value === v; else if (el.type !== 'file') el.value = String(v); });
+    }
+  } catch {}
+  const typeParam = new URLSearchParams(location.search).get('type');
+  if (typeParam) form.querySelectorAll<HTMLInputElement>('[name="type"]').forEach((r) => (r.checked = r.value === typeParam));
+
+  const val = (n: string) => (form.elements.namedItem(n) as RadioNodeList | HTMLInputElement | null)?.value ?? '';
+
+  function save() {
+    const data: Record<string, string> = {};
+    new FormData(form).forEach((v, k) => { if (typeof v === 'string' && !['company_website'].includes(k)) data[k] = v; });
+    try { localStorage.setItem(SAVE, JSON.stringify(data)); } catch {}
+  }
+
+  function estimate() {
+    const from = Number(form.querySelector<HTMLInputElement>('[name="type"]:checked')?.dataset.from ?? 0);
+    if (!from) return 'Quote in 24 h';
+    const q = Math.max(1, Number(val('quantity')) || 1);
+    const size = val('size');
+    let lo = from * (size.startsWith('Large') ? 1.4 : size.startsWith('Small') ? 0.85 : 1);
+    if (val('design') === 'Design it for me') lo += 25;
+    if (val('timing') === 'Rush') lo *= 1.25;
+    const disc = q >= 10 ? 0.85 : q >= 5 ? 0.9 : 1;
+    const total = Math.max(lo * q * disc, 15);
+    const hi = total * 1.2;
+    return q > 1 || lo !== from ? `$${Math.round(total)} – $${Math.round(hi)}` : `From $${from}`;
+  }
+
+  function paintSummary() {
+    const rows: [string, string][] = [
+      ['Item', val('type')],
+      ['Files', files.length ? `${files.length} added` : val('description') ? 'Described' : '—'],
+      ['Size', step >= 2 ? val('size') : '—'],
+      ['Colour', step >= 2 ? val('colour') : '—'],
+      ['Qty', step >= 2 ? val('quantity') : '—'],
+      ['Budget', step >= 3 ? val('budget') : '—'],
+      ['Needed', step >= 3 ? (val('timing') === 'By a date' && val('neededBy') ? val('neededBy') : val('timing')) : '—'],
+      ['Delivery', step >= 3 ? val('delivery') : '—'],
+    ];
+    const dl = document.querySelector('[data-summary]')!;
+    dl.replaceChildren(...rows.map(([k, v]) => { const d = document.createElement('div'); d.innerHTML = '<dt></dt><dd></dd>'; d.children[0].textContent = k; d.children[1].textContent = v || '—'; if (!v || v === '—') d.classList.add('is-empty'); return d; }));
+    document.querySelector('[data-estimate]')!.textContent = estimate();
+    const review = form.querySelector('[data-review]')!;
+    review.innerHTML = '<p class="mono-s kicker">Review your request</p>';
+    rows.filter(([, v]) => v && v !== '—').forEach(([k, v]) => { const p = document.createElement('p'); p.className = 'body-s'; p.innerHTML = '<b></b> '; p.querySelector('b')!.textContent = k + ':'; p.append(v); review.append(p); });
+  }
+
+  function show(i: number) {
+    step = i;
+    panels.forEach((p, j) => (p.hidden = j !== i));
+    items.forEach((it, j) => { it.classList.toggle('is-done', j < i); it.classList.toggle('is-current', j === i); });
+    next.textContent = nextLabels[i];
+    back.hidden = i === 0;
+    (form.querySelector('[data-charge]') as HTMLElement).hidden = i !== 4;
+    err.textContent = '';
+    paintSummary();
+    const top = document.querySelector('[data-stepper]') as HTMLElement;
+    if (lenis) lenis.scrollTo(top, { offset: -100 }); else top.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function validate(i: number) {
+    const panel = panels[i];
+    for (const el of panel.querySelectorAll<HTMLInputElement>('input, textarea, select')) {
+      if (!el.checkValidity()) { el.reportValidity(); return false; }
+    }
+    if (i === 1 && !files.length && !val('description').trim()) { err.textContent = 'Add a file or describe what you need.'; return false; }
+    return true;
+  }
+
+  function renderFiles() {
+    const list = form.querySelector('[data-file-list]')!;
+    list.replaceChildren(...files.map((f, i) => {
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="files__thumb"></span><span class="label-m"></span><span class="mono-s"></span><button type="button" aria-label="Remove">×</button>`;
+      if (f.type.startsWith('image/')) (li.querySelector('.files__thumb') as HTMLElement).style.backgroundImage = `url(${URL.createObjectURL(f)})`;
+      li.querySelector('.label-m')!.textContent = f.name;
+      li.querySelector('.mono-s')!.textContent = `${(f.size / 1048576).toFixed(1)} MB`;
+      li.querySelector('button')!.addEventListener('click', () => { files.splice(i, 1); renderFiles(); });
+      return li;
+    }));
+    paintSummary();
+  }
+  const addFiles = (list: FileList | null) => {
+    if (!list) return;
+    for (const f of list) {
+      if (f.size > 25 * 1048576) { err.textContent = `${f.name} is over 25 MB.`; continue; }
+      if (files.length < 10) files.push(f);
+    }
+    fileInput.value = '';
+    renderFiles();
+  };
+  fileInput.addEventListener('change', () => addFiles(fileInput.files));
+  const drop = form.querySelector<HTMLElement>('[data-drop]')!;
+  ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('is-over'); }));
+  ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('is-over'); }));
+  drop.addEventListener('drop', (e) => addFiles((e as DragEvent).dataTransfer?.files ?? null));
+
+  form.addEventListener('change', () => {
+    (form.querySelector('[data-dims]') as HTMLElement).hidden = val('size') !== 'Custom size';
+    (form.querySelector('[data-date]') as HTMLElement).hidden = val('timing') !== 'By a date';
+    save(); paintSummary();
+  });
+  form.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) => b.addEventListener('click', () => {
+    const q = form.querySelector<HTMLInputElement>('[name="quantity"]')!;
+    q.value = String(Math.max(1, Math.min(1000, (Number(q.value) || 1) + Number(b.dataset.q))));
+    form.dispatchEvent(new Event('change'));
+  }));
+  back.addEventListener('click', () => show(Math.max(0, step - 1)));
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!validate(step)) return;
+    if (step < 4) return show(step + 1);
+    const data = new FormData(form);
+    data.delete('files');
+    files.forEach((f) => data.append('files', f));
+    data.set('estimate', estimate());
+    next.disabled = true; next.textContent = 'Sending…';
+    try {
+      const { id } = await submitQuote(data, 'custom-build');
+      try { localStorage.removeItem(SAVE); } catch {}
+      document.querySelector('[data-thanks-id]')!.textContent = `Request #${id} sent`;
+      document.querySelector('[data-thanks-text]')!.textContent = `We'll email ${val('email')} with your price and a digital proof within 24 hours. Nothing is charged until you approve.`;
+      document.querySelectorAll<HTMLElement>('.head, .body, [data-stepper]').forEach((el) => (el.hidden = true));
+      (document.querySelector('[data-thanks]') as HTMLElement).hidden = false;
+      window.scrollTo({ top: 0 });
+    } catch (ex) {
+      err.textContent = (ex as Error).message;
+      next.disabled = false; next.textContent = nextLabels[4];
+    }
+  });
+
+  form.dispatchEvent(new Event('change'));
+  show(0);
+  window.scrollTo({ top: 0 });
+</script>
+
+<style>
+  .head { display: flex; flex-direction: column; gap: 14px; padding-block: 56px 32px; }
+  .head .body-l { max-width: 720px; }
+  .stepper { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; padding-bottom: 40px; }
+  .stepper li { display: flex; flex-direction: column; gap: 10px; color: var(--muted); white-space: pre; }
+  .stepper__bar { height: 4px; background: var(--grid); }
+  .stepper li.is-done, .stepper li.is-current { color: var(--ink); }
+  .stepper li.is-done .stepper__bar, .stepper li.is-current .stepper__bar { background: var(--accent); }
+  .stepper li.is-done .mono-s::after { content: '  ✓'; }
+  .body { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 40px; align-items: start; padding-bottom: 120px; }
+  .card-form { background: var(--surface); border-radius: var(--r-panel); padding: 40px; display: flex; flex-direction: column; gap: 24px; }
+  .step { border: 0; display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .step legend { margin-bottom: 4px; }
+  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .opts--3 { grid-template-columns: repeat(3, 1fr); }
+  .drop { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 48px 24px; border: 2px dashed var(--accent); border-radius: 18px; background: #fff5f0; text-align: center; cursor: pointer; transition: background 200ms; }
+  .drop.is-over { background: var(--accent-soft); }
+  .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
+  .drop__icon { width: 56px; height: 56px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-size: 1.5rem; font-weight: 700; }
+  .files { display: flex; flex-direction: column; gap: 10px; }
+  .files :global(li) { display: grid; grid-template-columns: 48px 1fr auto auto; gap: 14px; align-items: center; padding: 10px; border-radius: 12px; background: var(--paper); }
+  .files :global(.files__thumb) { width: 48px; height: 48px; border-radius: 8px; background: #d9cfc0 center/cover; }
+  .files :global(button) { font-size: 1.375rem; color: var(--muted); padding: 0 8px; }
+  .tip { display: flex; gap: 12px; align-items: center; padding: 14px 16px; border-radius: 12px; background: var(--paper); color: var(--ink); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .dims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .dims[hidden], [data-date][hidden] { display: none; }
+  .qty { display: flex; align-items: center; border: 1.5px solid var(--grid); border-radius: 999px; }
+  .qty button { width: 48px; height: 48px; font-weight: 600; font-size: 1.125rem; }
+  .qty__n { width: 56px; text-align: center; border: 0; font-weight: 600; background: transparent; -moz-appearance: textfield; }
+  .qty__n::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .banner { padding: 14px 18px; border-radius: 12px; background: var(--accent); color: var(--ink); }
+  .review { display: flex; flex-direction: column; gap: 6px; padding: 18px; border-radius: 14px; background: var(--paper); }
+  .err { color: #b42318; }
+  .err:empty { display: none; }
+  .nav-btns { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
+  .nav-btns [data-back] { margin-right: auto; }
+  .muted { color: var(--muted); }
+  .summary { position: sticky; top: 100px; display: flex; flex-direction: column; gap: 16px; padding: 32px; border-radius: var(--r-panel); background: var(--ink); }
+  .summary :global(dl > div) { display: flex; justify-content: space-between; gap: 16px; padding-block: 6px; font-size: 0.9375rem; }
+  .summary :global(dt) { color: var(--grid); }
+  .summary :global(dd) { color: var(--paper); font-weight: 500; text-align: right; }
+  .summary :global(.is-empty dd) { color: #77736c; }
+  .summary hr { border: 0; border-top: 1px solid rgb(244 242 238 / 0.15); }
+  .summary .tag { color: var(--paper); }
+  .thanks { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 24px; padding-block: 96px 140px; }
+  .thanks .body-l { max-width: 720px; }
+  .thanks__tick { width: 96px; height: 96px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; font-size: 2.75rem; font-weight: 700; }
+  .thanks__next { text-align: left; width: 100%; margin-block: 24px; }
+  .thanks__next li { display: flex; flex-direction: column; gap: 12px; padding: 28px; border-radius: 18px; background: var(--surface); }
+  .thanks__next li:first-child { background: var(--ink); color: var(--paper); }
+  .thanks__next li:first-child .display-s { color: var(--paper); }
+  .thanks__next li:first-child .body-s { color: var(--grid); }
+  [hidden] { display: none !important; }
+  .body > * { min-width: 0; }
+  @media (max-width: 991px) {
+    .body { grid-template-columns: minmax(0, 1fr); }
+    .summary { position: static; order: -1; }
+  }
+  @media (max-width: 767px) {
+    .head { padding-block: 32px 20px; }
+    .stepper li .mono-s { font-size: 0; }
+    .stepper { padding-bottom: 24px; }
+    .card-form { padding: 20px; }
+    .opts, .opts--3, .two { grid-template-columns: 1fr; }
+    .summary { padding: 20px; gap: 10px; }
+    .summary :global(dl) { display: none; }
+    .summary .display-m { font-size: 2rem; }
+    .nav-btns .muted { display: none; }
+    .nav-btns { position: sticky; bottom: 0; background: var(--surface); padding-block: 12px; margin-inline: -20px; padding-inline: 20px; border-top: 1px solid var(--grid); }
+  }
+</style>

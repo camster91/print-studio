@@ -33,6 +33,9 @@ jobs:
           fi
           echo "Building for $SITE_URL"
 
+      - name: Test pricing
+        run: npm test
+
       - name: Build
         run: npm run build
         env:

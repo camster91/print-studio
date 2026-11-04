@@ -1,31 +1,27 @@
-const DISCOUNT = 40;
-
-/** Everything that changes per product or campaign. */
+/** Everything that changes per business setting. */
 export const site = {
-  name: 'Stride',
-  /** The cart's Checkout button links here. The visitor's ad parameters
-      (utm_*, fbclid, gclid, ttclid…) are appended automatically. */
-  checkoutUrl: 'https://example.com/checkout',
-  currency: 'USD',
-  product: {
-    id: 'sola-stride',
-    name: 'Sola Stride',
-    price: 299,
-    image: '/assets/images/product-green.avif',
+  name: 'Layerline Studio',
+  shortName: 'Layerline',
+  tagline: 'Printed in Toronto',
+  email: 'hello@layerline.ca',
+  instagram: 'https://instagram.com/',
+  etsy: 'https://www.etsy.com/',
+  currency: 'CAD',
+  locale: 'en-CA',
+  /** Holiday cutoff shown in banners. Set to '' to hide. */
+  holidayCutoff: 'Dec 4',
+  /** Free shipping in Canada at or above this subtotal (CAD). */
+  freeShippingFrom: 100,
+  shippingCanada: 12,
+  minimumCustomJob: 15,
+  /** Worker endpoints (same origin). */
+  api: {
+    checkout: '/api/checkout',
+    quote: '/api/quote',
+    upload: '/api/upload',
   },
-  cart: {
-    storageKey: 'Stride-cart',
-  },
-  discount: DISCOUNT,
-  price: { now: '$299', was: '$499' },
-  promo: { text: `Up to ${DISCOUNT}% OFF · code: FALL`, code: 'FALL' },
-  /** Footer links: full URLs or paths on this site. */
-  legal: {
-    refund: '#',
-    privacy: '#',
-    terms: '#',
-  },
-  /** Each tag loads only when its ID is set. GTM: "GTM-XXXXXXX". Meta Pixel:
-      digits only. GA4: "G-XXXXXXXXXX", left empty if GA4 runs inside GTM. */
+  cart: { storageKey: 'layerline-cart' },
+  legal: { refund: '/policies#returns', privacy: '/policies#privacy', terms: '/policies#terms' },
+  /** Each tag loads only when its ID is set. */
   analytics: { gtmId: '', metaPixelId: '', ga4Id: '' },
 };
