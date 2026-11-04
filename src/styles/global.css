@@ -193,6 +193,8 @@ html.lenis, html.lenis body { height: auto; }
 .photo img { width: 100%; height: 100%; object-fit: cover; }
 .photo__caption { font-family: var(--font-mono-stack); font-size: 0.6875rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 16px; }
 .photo--dark { background: var(--chamber); color: #8a877f; }
+.photo__note { position: absolute; left: 10px; bottom: 10px; padding: 3px 8px; border-radius: 999px; background: rgb(20 20 20 / 0.6); color: #fff; font-family: var(--font-mono-stack); font-size: 0.625rem; letter-spacing: 0.06em; text-transform: uppercase; pointer-events: none; }
+.thumb .photo__note, .photo.thumb .photo__note { display: none; }
 .photo--warm { background: #ffdc9e; color: #6b4a12; }
 
 /* Product card */

@@ -52,22 +52,19 @@ STRIPE_SECRET_KEY=sk_test_...
 
 Uploads and quote requests are stored in a local R2 simulation while developing.
 
-## Going live (one-time setup)
+## Hosting (live)
 
-1. **Stripe:** create an account at stripe.com (Canada, CAD). Copy the secret key (start with `sk_test_…`).
-2. **Cloudflare:**
-   ```bash
-   npx wrangler login
-   npx wrangler r2 bucket create layerline-uploads
-   npx wrangler secret put STRIPE_SECRET_KEY
-   npm run deploy
-   ```
-3. **Domain:** add `layerline.ca` as a custom domain on the `layerline` Worker. Set the GitHub repo variable
-   `SITE_URL=https://layerline.ca` and secrets `CLOUDFLARE_API_TOKEN` + `CLOUDFLARE_ACCOUNT_ID` so every push to
-   `main` tests, builds and deploys.
-4. **Request emails (optional):** turn on Email Routing for the domain, verify your inbox, then in `wrangler.jsonc`
-   uncomment `send_email` and set `NOTIFY_TO`. Without it, requests are still saved in R2 under `requests/<id>/`.
-5. When test orders work end to end, swap in the `sk_live_…` key with `wrangler secret put STRIPE_SECRET_KEY`.
+- **Site:** https://layerline.ca (also www and `layerline.camster915391.workers.dev`) on the `layerline` Worker.
+- **Deploys:** Cloudflare Workers Builds watches `main`. Every push runs `npm ci && npm test && npm run build`,
+  then `npx wrangler deploy`. GitHub Actions (`check.yml`) also runs tests + build on every push.
+- **Uploads + requests:** R2 bucket `layerline-uploads`.
+- **Request emails:** Email Routing is on for layerline.ca. `hello@layerline.ca` forwards to cameron@ashbi.ca, and
+  every `/api/quote` request is emailed to `NOTIFY_TO` from `requests@layerline.ca`.
+- **Stripe:** add `STRIPE_SECRET_KEY` as a **Secret** on the Worker (dashboard → Workers → layerline → Settings →
+  Variables and Secrets). Use `sk_test_…` first, then swap to `sk_live_…`. Until it's set, checkout shows a friendly
+  "not switched on yet" message.
+- **Photos:** `public/renders/` holds AI preview images (made with Higgsfield). They show a small "Preview image"
+  tag. Replace them with real photos in `public/products/<slug>/` and update `images` in `products.json`.
 
 ### How an order flows
 

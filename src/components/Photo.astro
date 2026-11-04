@@ -2,6 +2,7 @@
 /**
  * Product/lifestyle photo. Until real photos exist it renders a labelled placeholder,
  * matching the Figma prototype. Pass `src` once the shoot is done.
+ * Images in /renders/ are AI previews and get a small "Preview image" tag until real photos replace them.
  */
 interface Props {
   caption: string;
@@ -18,7 +19,10 @@ const { caption, src, alt = caption, tone = 'default', class: cls = '', style, e
 <div class:list={['photo', tone !== 'default' && `photo--${tone}`, cls]} style={style}>
   {
     src ? (
-      <img src={src} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+      <>
+        <img src={src} alt={alt} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+        {src.startsWith('/renders/') && <span class="photo__note">Preview image</span>}
+      </>
     ) : (
       <span class="photo__caption" role="img" aria-label={`Photo coming soon: ${alt}`}>Photo · {caption}</span>
     )

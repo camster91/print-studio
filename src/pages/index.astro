@@ -11,10 +11,9 @@ import { site } from '../config/site';
 const featured = ['led-name-sign', 'lithophane-photo-box', 'qr-review-stand', 'm18-battery-mount-5-pack'].map((s) => products.find((p) => p.slug === s)!);
 const reviews = reviewsData.reviews as { quote: string; name: string; product: string; stars: number }[];
 const ledSigns = [
-  { title: 'Streamer name', cap: 'NAME SIGN, LIT, DARK DESK', glow: 'cyan' },
-  { title: 'Podcast ON AIR', cap: 'ON AIR BOX, LIT', glow: 'magenta' },
-  { title: 'Gamer tag', cap: 'GAMER TAG SIGN, LIT', glow: 'accent' },
-  { title: 'Desk LIVE light', cap: 'LIVE SIGN ON SHELF', glow: 'cyan' },
+  { title: 'Streamer name', cap: 'NAME SIGN, LIT, DARK DESK', glow: 'cyan', src: '/renders/led-name-sign.webp' },
+  { title: 'Podcast ON AIR', cap: 'ON AIR BOX, LIT', glow: 'magenta', src: '/renders/on-air-light-box.webp' },
+  { title: 'Room sign', cap: 'NAME SIGN ABOVE DESK, LIT', glow: 'accent', src: '/renders/home-led-studio.webp' },
 ];
 const steps = [
   ['01', 'Upload', 'Send a photo, logo, sketch or STL. No file? Just describe it.'],
@@ -45,7 +44,7 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
         </dl>
       </div>
       <div class="hero__visual" data-reveal="fade">
-        <Photo caption="LED name sign, lit, dark desk setup" tone="dark" class="hero__photo" eager />
+        <Photo caption="LED name sign, lit, dark desk setup" src="/renders/home-led-studio.webp" alt="Glowing orange LED sign above a dark desk setup" tone="dark" class="hero__photo" eager />
         <div class="hero__dim mono-s" aria-hidden="true"><span></span>← 200 mm →<span></span></div>
         <span class="tag">0.2 mm · PLA matte · 3 h 40 m</span>
       </div>
@@ -87,8 +86,8 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
         <a href="/products/lithophane-photo-box" class="btn btn--dark" style="width:fit-content">Upload your photos</a>
       </div>
       <div class="compare" data-compare>
-        <Photo caption="Unlit · white relief" class="compare__img" />
-        <div class="compare__top" data-compare-top><Photo caption="Lit · your photo appears" tone="warm" class="compare__img" /></div>
+        <Photo caption="Unlit · white relief" src="/renders/lithophane-unlit.webp" alt="Lithophane panel unlit, showing white relief" class="compare__img" />
+        <div class="compare__top" data-compare-top><Photo caption="Lit · your photo appears" src="/renders/lithophane-lit.webp" alt="Same lithophane lit from behind, family photo appears" tone="warm" class="compare__img" /></div>
         <input type="range" min="0" max="100" value="50" aria-label="Switch the light on and off" data-compare-range />
         <span class="compare__handle" data-compare-handle aria-hidden="true"></span>
       </div>
@@ -119,7 +118,7 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
         <div class="swiper-wrapper">
           {ledSigns.map((s) => (
             <a href="/products/led-name-sign" class="swiper-slide led__slide">
-              <Photo caption={s.cap} tone="dark" class={`led__photo glow-${s.glow}`} />
+              <Photo caption={s.cap} src={s.src} tone="dark" class={`led__photo glow-${s.glow}`} />
               <span class="row led__meta"><span class="label-l">{s.title}</span><span class="mono-s">From $45</span></span>
             </a>
           ))}
@@ -146,7 +145,7 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
         </table>
         <div class="row gap-16 wrap"><a href="/business#sample" class="btn btn--primary">Get a free sample</a><a href="/business" class="btn btn--outline">Bulk & nameplates</a></div>
       </div>
-      <Photo caption="QR stand on café counter, logo + Google review" style="aspect-ratio: 13/10" />
+      <Photo caption="QR stand on café counter, logo + Google review" src="/renders/qr-review-stand.webp" alt="QR review stand on a café counter" style="aspect-ratio: 13/10" />
     </div>
   </section>
 
