@@ -35,28 +35,38 @@ export async function stripeWebhook(req: Request, env: Env, notify: typeof sendA
   if (session.livemode !== env.STRIPE_SECRET_KEY.startsWith('sk_live_')) return jsonResponse({ error: 'Mode mismatch' }, 400);
   const id = session.metadata.order_id;
   if (!/^LL-[a-f0-9-]{36}$/.test(id ?? '')) return jsonResponse({ error: 'Missing order ID' }, 400);
-  const saved = await env.UPLOADS.get(`pending/${id}.json`);
-  if (!saved) return jsonResponse({ error: 'Missing print record; retry or reconcile manually' }, 500);
-  const snapshot = await saved.json<Snapshot>();
+  const bucket = env.UPLOADS;
   const month = new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto',year:'numeric',month:'2-digit'}).format(new Date(event.created * 1000));
-  const key = `${session.livemode ? 'orders' : 'test-orders'}/${month}/${session.id}.json`;
-  const existing = await env.UPLOADS.get(key);
-  const previous = existing ? await existing.json<PaidOrder>() : null;
-  if (previous?.notifiedAt) return jsonResponse({ received: true });
+  const prefix = session.livemode ? 'orders' : 'test-orders';
+  const indexKey = `order-index/${prefix}/${session.id}.json`;
+  const fallbackKey = `${prefix}/${month}/${session.id}.json`;
+  async function storedOrder() {
+    const index = await bucket.get(indexKey);
+    const key = index ? (await index.json<{key:string}>()).key : fallbackKey;
+    const record = await bucket.get(key);
+    return {key,order:record ? await record.json<PaidOrder>() : null};
+  }
+  // Look up by session before the short-lived draft: paid records outlive artwork/drafts.
+  if ((await storedOrder()).order?.notifiedAt) return jsonResponse({ received: true });
   const lockKey = `locks/${session.id}.json`;
   const lock = await env.UPLOADS.put(lockKey, JSON.stringify({ at: Date.now() }), { onlyIf: { etagDoesNotMatch: '*' } });
   if (!lock) return jsonResponse({ error: 'Order processing; retry' }, 503);
   try {
-    // Recheck after taking the lock to handle deliveries racing with the previous attempt.
-    const check = await env.UPLOADS.get(key);
-    if (check && (await check.json<PaidOrder>()).notifiedAt) return jsonResponse({ received: true });
+    // Another event may have finished while this delivery was waiting for the lock.
+    const {key,order:previous} = await storedOrder();
+    if (previous?.notifiedAt) return jsonResponse({ received: true });
+    const saved = await bucket.get(`pending/${id}.json`);
+    const snapshot = saved ? await saved.json<Snapshot>() : previous;
+    if (!snapshot) return jsonResponse({ error: 'Missing print record; retry or reconcile manually' }, 500);
     const full = await stripe.checkout.sessions.retrieve(session.id, { expand: ['shipping_cost.shipping_rate', 'payment_intent.latest_charge.balance_transaction'] });
     if (full.payment_status !== 'paid' || full.metadata?.order_id !== id || full.metadata?.source !== 'layerline') throw new Error('Invalid paid session');
     const intent = typeof full.payment_intent === 'object' ? full.payment_intent : null;
     const charge = intent && typeof intent.latest_charge === 'object' ? intent.latest_charge : null;
     const balance = charge && typeof charge.balance_transaction === 'object' ? charge.balance_transaction : null;
     const rate = full.shipping_cost?.shipping_rate;
-    const order: PaidOrder = { ...snapshot, sessionId: full.id, live: full.livemode, paidAt: new Date(event.created * 1000).toISOString(), total: full.amount_total ?? 0, tax: full.total_details?.amount_tax ?? 0, discount: full.total_details?.amount_discount ?? 0, shipping: full.total_details?.amount_shipping ?? 0, fee: balance?.fee ?? null, customer: full.customer_details, delivery: full.collected_information?.shipping_details ?? null, shippingChoice: typeof rate === 'object' && rate ? rate.display_name ?? 'See Stripe' : 'See Stripe', ...previous };
+    const order: PaidOrder = { ...previous, ...snapshot, sessionId: full.id, live: full.livemode, paidAt: previous?.paidAt ?? new Date(event.created * 1000).toISOString(), total: full.amount_total ?? 0, tax: full.total_details?.amount_tax ?? 0, discount: full.total_details?.amount_discount ?? 0, shipping: full.total_details?.amount_shipping ?? 0, fee: balance?.fee ?? null, customer: full.customer_details, delivery: full.collected_information?.shipping_details ?? null, shippingChoice: typeof rate === 'object' && rate ? rate.display_name ?? 'See Stripe' : 'See Stripe' };
+    // Keep a stable record location even when a second paid event arrives in a later month.
+    await bucket.put(indexKey,JSON.stringify({key}),{httpMetadata:{contentType:'application/json'}});
     await env.UPLOADS.put(key, JSON.stringify(order), { httpMetadata: { contentType: 'application/json' } });
     await notify(env, `${order.live ? '' : '[TEST] '}Paid ${order.id} — CAD ${(order.total / 100).toFixed(2)}`, orderEmail(order), order.customer?.email ?? undefined);
     order.notifiedAt = new Date().toISOString();

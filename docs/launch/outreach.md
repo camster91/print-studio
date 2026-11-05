@@ -1,6 +1,6 @@
 # Local outreach kit - drafts, no messages sent
 
-15 prospects are in `outreach-tracker.csv`, using official business websites checked Nov 4, 2026. This is a prospect list, not a contact list, partnership or verified walking route. Confirm branch, location and opening hours before travelling. Pilot's exact east-end branch still needs confirmation. Do not search for private personal contact details.
+15 shopfront prospects are in `outreach-tracker.csv`, with public addresses checked against merchant websites, a supplier partner directory or the local BIA listing. Pilot’s two east-end branches are now identified. Reopening-only or unreadable/404 prospects were replaced. Some brands have more than one branch. This is a prospect list, not a contact list, partnership or verified walking route. Confirm opening hours before travelling. Dome is appointment-only: obtain permission first. Do not search for private personal contact details.
 
 ## Walk-in script
 
@@ -28,3 +28,12 @@ The PDF is a print-ready draft; approve prices before handing it out. The QR lea
 “Hi [name], it’s Cameron from Layerline Studio. Thanks for taking a look at the QR stand. Did it fit your counter and scan easily? I can adjust the shape or colours if useful. A stand starts at $25 CAD, with a proof before printing. If now isn’t a good time, no problem.”
 
 Record the actual visit date, permission to follow up, due date seven days later and response. Cameron must approve any follow-up message and recipient before sending. Do not contact all 15 automatically.
+
+## Suggested visit groups
+
+- Scarborough: Karkumi, Kanafani, Lamanna. These are separate neighbourhoods: choose a small route rather than assuming one walking loop.
+- Gerrard/Danforth: Black Pony, Little London, Red Rocket branches, Pilot Wagstaff.
+- Queen East/Riverside: Mercury Queen, Pilot Leslieville, Album, Dark Horse Queen; Dome only by appointment.
+- Corktown: Mercury King, Dark Horse Canary.
+
+These are geographic groups, not live travel-time estimates. Get approval before outreach and confirm each shop’s preferred review/booking link before printing personalised samples.

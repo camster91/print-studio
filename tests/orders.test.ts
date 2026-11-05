@@ -37,3 +37,25 @@ test('paid order stores full print details, retries failed mail and deduplicates
     const stored=JSON.parse([...memory.entries()].find(([k])=>k.startsWith('test-orders/'))![1]);assert.equal(stored.fee,247);assert.ok(stored.notifiedAt);
   } finally {globalThis.fetch=original;}
 });
+
+test('one session has one order and alert across month boundaries and expired checkout drafts',async()=>{
+ const id='LL-12345678-1234-1234-1234-123456789abc';
+ const event=(type:string,created:number)=>JSON.stringify({id:'evt_'+type,type,created,data:{object:{id:'cs_test_month_boundary',livemode:false,payment_status:'paid',metadata:{source:'layerline',order_id:id}}}});
+ const first=event('checkout.session.completed',Date.parse('2026-11-01T03:59:00Z')/1000);
+ const later=event('checkout.session.async_payment_succeeded',Date.parse('2026-11-01T05:01:00Z')/1000);
+ const snapshot={id,createdAt:'2026-11-01T03:55:00Z',lines:[],attribution:{}};
+ const memory=new Map<string,string>([[`pending/${id}.json`,JSON.stringify(snapshot)]]);
+ const bucket={async get(key:string){const v=memory.get(key);return v?{async json(){return JSON.parse(v);}}:null;},async put(key:string,value:string,options?:{onlyIf?:unknown}){if(options?.onlyIf && memory.has(key))return null;memory.set(key,value);return {};},async delete(key:string){memory.delete(key);}};
+ const e={...env as object,UPLOADS:bucket} as never;
+ const old=globalThis.fetch;let calls=0;
+ globalThis.fetch=async()=>new Response(JSON.stringify({id:'cs_test_month_boundary',currency:'cad',payment_status:'paid',livemode:false,metadata:{source:'layerline',order_id:id},amount_total:2500,customer_details:null}),{headers:{'content-type':'application/json'}});
+ try{
+  assert.equal((await stripeWebhook(req(first,sign(first)),e,async()=>{calls++;})).status,200);
+  assert.equal((await stripeWebhook(req(later,sign(later)),e,async()=>{calls++;})).status,200);
+  assert.equal(calls,1);
+  assert.equal([...memory.keys()].filter(k=>k.startsWith('test-orders/')).length,1);
+  memory.delete(`pending/${id}.json`);
+  assert.equal((await stripeWebhook(req(first,sign(first)),e,async()=>{calls++;})).status,200);
+  assert.equal(calls,1);
+ }finally{globalThis.fetch=old;}
+});

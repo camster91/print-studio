@@ -4,6 +4,7 @@ import Photo from '../../components/Photo.astro';
 import ProductCard from '../../components/ProductCard.astro';
 import { products, type Product, typeLabel, audience, blurbs, money, filamentColours, valueLabel, valuePrice, valueAdd, defaultValue } from '../../lib/products';
 import { unitPrice } from '../../lib/pricing';
+import { productImages } from '../../lib/images';
 import { site } from '../../config/site';
 
 export function getStaticPaths() {
@@ -19,11 +20,9 @@ const startPrice = unitPrice(p, {}, 1);
 const choices = p.options.choices ?? [];
 const fields = p.options.fields ?? [];
 const placeholderShots = p.led ? ['Hero, lit', 'Unlit, daylight', 'Detail of layers', 'In hand, for scale', 'In use'] : ['Hero', 'Detail of layers', 'In hand, for scale', 'In use', 'All colours'];
-const shots = p.images?.length ? p.images.map((_, i) => (i === 0 ? 'Hero' : `Photo ${i + 1}`)) : placeholderShots;
+const galleryImages = productImages(p);
+const shots = galleryImages.length ? galleryImages.map((_, i) => (i === 0 ? 'Hero' : `Photo ${i + 1}`)) : placeholderShots;
 const related = products.filter((x) => x.slug !== p.slug && (x.category === p.category || x.type === p.type)).slice(0, 4);
-const optionImages = { ...(p.optionImages ?? {}) };
-for (const choice of choices) for (const value of choice.values) if (typeof value !== 'string' && value.images?.length) (optionImages[choice.name] ??= {})[value.label] = value.images;
-for (const size of p.options.size ?? []) if (size.images?.length) (optionImages.Size ??= {})[size.label] = size.images;
 const photoCount = p.options.photos ?? 0;
 const needsLogo = p.options.logo;
 const details = [
@@ -36,23 +35,23 @@ const details = [
 ---
 
 <BaseLayout title={p.name} description={`${blurbs[p.slug]} ${typeLabel[p.type]} from ${money(startPrice)} CAD. Made in Toronto.`}>
-  <script slot="head" type="application/ld+json" set:html={JSON.stringify({ '@context':'https://schema.org', '@type':'Product', name:p.name, description:blurbs[p.slug], image:(p.images ?? []).map(src => new URL(src,'https://layerline.ca').href), sku:p.slug, brand:{'@type':'Brand',name:'Layerline Studio'}, offers:{'@type':'Offer',url:`https://layerline.ca/products/${p.slug}/`,priceCurrency:'CAD',price:startPrice,seller:{'@type':'Organization',name:'Layerline Studio'},itemCondition:'https://schema.org/NewCondition'} }).replaceAll('<','\u003c')} />
+  <script slot="head" type="application/ld+json" set:html={JSON.stringify({ '@context':'https://schema.org', '@type':'Product', name:p.name, description:blurbs[p.slug], image:galleryImages.map(src => new URL(src,'https://layerline.ca').href), sku:p.slug, brand:{'@type':'Brand',name:'Layerline Studio'}, offers:{'@type':'Offer',url:`https://layerline.ca/products/${p.slug}/`,priceCurrency:'CAD',price:startPrice,seller:{'@type':'Organization',name:'Layerline Studio'},itemCondition:'https://schema.org/NewCondition'} }).replaceAll('<','\u003c')} />
   <div class="container crumbs mono-s"><a href="/shop">Shop</a> / <a href={`/shop?category=${p.category}`}>{audience[p.category].replace('For ', '')}</a> / {p.name}</div>
 
   <section class="container pdp">
     <div class="pdp__gallery">
       <div class="swiper gallery" data-swiper="gallery">
         <div class="swiper-wrapper">
-          {shots.map((s, i) => <div class="swiper-slide"><Photo caption={`${p.name} — ${s}`} src={p.images?.[i]} tone={p.led && i === 0 ? 'warm' : 'default'} class="gallery__photo" eager={i === 0} /></div>)}
+          {shots.map((s, i) => <div class="swiper-slide"><Photo caption={`${p.name} — ${s}`} src={galleryImages[i]} tone={p.led && i === 0 ? 'warm' : 'default'} class="gallery__photo" eager={i === 0} /></div>)}
         </div>
       </div>
       <div class="thumbs" hidden={shots.length < 2}>
-        {shots.map((s, i) => <button data-thumb aria-label={`Show photo ${i + 1}: ${s}`}><Photo caption={s} src={p.images?.[i]} class="thumb" /></button>)}
+        {shots.map((s, i) => <button data-thumb aria-label={`Show photo ${i + 1}: ${s}`}><Photo caption={s} src={galleryImages[i]} class="thumb" /></button>)}
       </div>
     </div>
 
     <form class="buy" data-buy data-slug={p.slug} data-name={p.name} data-type={p.type} data-base={p.price}
-      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0} data-choices={JSON.stringify(choices)} data-option-images={JSON.stringify(optionImages)} data-images={JSON.stringify(p.images ?? [])}>
+      data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0} data-choices={JSON.stringify(choices)}>
       <div class="row gap-12 wrap"><span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span><span class="mono-s kicker">{audience[p.category]}</span></div>
       <h1 class="display-l">{p.name}</h1>
       {!p.productionReady && <p class="note body-s">Sample testing in progress. Images are previews. Live ordering opens after production checks; you can request a quote now.</p>}
@@ -163,7 +162,9 @@ const details = [
 
 <script>
   import { addToCart, trackAdd } from '../../lib/cart';
-  import { money } from '../../lib/products';
+  import { money, bySlug } from '../../lib/products';
+  import { productImages } from '../../lib/images';
+  import type Swiper from 'swiper';
   import { site } from '../../config/site';
 
   import {track} from '../../lib/analytics';
@@ -204,24 +205,34 @@ const details = [
     const name = form.querySelector('[data-colour-name]');
     if (colour && name) name.textContent = colour.value;
   };
-  const optionImages: Record<string, Record<string, string[]>> = JSON.parse(d.optionImages!);
-  const baseImages: string[] = JSON.parse(d.images!);
+  const selectedProduct = bySlug(d.slug!)!;
+  const gallery = document.querySelector<HTMLElement>('.gallery') as HTMLElement & {swiper?:Swiper};
+  const thumbs = document.querySelector<HTMLElement>('.thumbs')!;
+  let imageSignature = JSON.stringify(productImages(selectedProduct));
+  let galleryEventsBound = false;
+  function markThumbs() { thumbs.querySelectorAll('button').forEach((button,index)=>button.setAttribute('aria-current',String(index===(gallery.swiper?.activeIndex ?? 0)))); }
+  function photo(src: string | undefined, caption: string, className: string) {
+    const box=document.createElement('div');box.className=`photo ${className}`;
+    if(src){
+      const image=document.createElement('img');image.src=src;image.alt=caption;image.decoding='async';box.append(image);
+      if(src.startsWith('/renders/')){const note=document.createElement('span');note.className='photo__note';note.textContent='Preview image';box.append(note);}
+    }else{const note=document.createElement('span');note.className='photo__caption';note.setAttribute('role','img');note.setAttribute('aria-label',`Photo coming soon: ${caption}`);note.textContent='Matching photo coming soon';box.append(note);}
+    return box;
+  }
   function swapImage() {
-    const picked = new FormData(form);
-    let image = baseImages[0];
-    for (const [name, values] of Object.entries(optionImages)) {
-      const match = values[String(picked.get(name) ?? '')];
-      if (match?.length) image = match[0];
-    }
-    const img = document.querySelector<HTMLImageElement>('.gallery img');
-    if (img && image) {
-      img.src = image; img.removeAttribute('srcset');
-      img.alt = `${d.name} — ${Object.entries(optionImages).map(([key])=>picked.get(key)).filter(Boolean).join(', ')}`;
-      const note = img.parentElement?.querySelector<HTMLElement>('.photo__note');
-      if (note) note.hidden = !image.startsWith('/renders/');
-      const gallery = document.querySelector('.gallery') as HTMLElement & {swiper?: {slideTo:(index:number)=>void}};
-      gallery?.swiper?.slideTo(0);
-    }
+    const options=Object.fromEntries([...new FormData(form)].filter((entry): entry is [string,string]=>typeof entry[1]==='string'));
+    const images=productImages(selectedProduct,options);
+    const signature=JSON.stringify(images);
+    if(signature===imageSignature)return;
+    imageSignature=signature;
+    const caption=`${d.name} — ${Object.values(options).join(', ')}`;
+    const slides=(images.length?images:[undefined]).map((src,index)=>{const slide=document.createElement('div');slide.className='swiper-slide';slide.append(photo(src,`${caption}, photo ${index+1}`,'gallery__photo'));return slide;});
+    gallery.querySelector('.swiper-wrapper')!.replaceChildren(...slides);
+    thumbs.replaceChildren(...images.map((src,index)=>{const button=document.createElement('button');button.type='button';button.setAttribute('aria-label',`Show photo ${index+1}`);button.append(photo(src,`${d.name}, photo ${index+1}`,'thumb'));button.addEventListener('click',()=>gallery.swiper?.slideTo(index));return button;}));
+    thumbs.hidden=images.length<2;
+    gallery.swiper?.update();gallery.swiper?.slideTo(0);
+    if(gallery.swiper && !galleryEventsBound){gallery.swiper.on('slideChange',markThumbs);galleryEventsBound=true;}
+    markThumbs();
   }
   form.addEventListener('change', () => { repaint(); swapImage(); });
   form.querySelectorAll<HTMLButtonElement>('[data-q]').forEach((b) => b.addEventListener('click', () => { qty = Math.max(1, Math.min(50, qty + Number(b.dataset.q))); repaint(); }));

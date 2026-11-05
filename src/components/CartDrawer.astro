@@ -54,6 +54,7 @@ import { site } from '../config/site';
   import { site } from '../config/site';
   import { getCart, setQuantity, checkout, type CartItem } from '../lib/cart';
   import { money, bySlug } from '../lib/products';
+  import { productImages } from '../lib/images';
 
   const drawer = document.querySelector<HTMLDialogElement>('[data-cart]')!;
   const lines = drawer.querySelector<HTMLElement>('[data-cart-lines]')!;
@@ -78,9 +79,9 @@ import { site } from '../config/site';
     lines.replaceChildren(...items.map((item) => {
       const row = tpl.content.firstElementChild!.cloneNode(true) as HTMLElement;
       const product = bySlug(item.slug);
-      let src = product?.images?.[0];
-      for (const [name, values] of Object.entries(product?.optionImages ?? {})) if (values[item.options[name]]?.[0]) src = values[item.options[name]][0];
+      const src = product ? productImages(product,item.options)[0] : undefined;
       if (src) { const img=document.createElement('img'); img.src=src;img.alt=item.name;img.loading='lazy';row.querySelector('.line__thumb')!.append(img); if(src.startsWith('/renders/')) { const note=document.createElement('span');note.textContent='Preview image';row.querySelector('.line__thumb')!.append(note); } }
+      if (!src) { const note=document.createElement('span');note.textContent='Photo coming soon';row.querySelector('.line__thumb')!.append(note); }
       row.querySelector('[data-line-name]')!.textContent = item.name;
       row.querySelector('[data-line-opts]')!.textContent = Object.values(item.options).filter(Boolean).join(' · ') + (item.files?.length ? ` · ${item.files.length} file(s)` : '');
       row.querySelector('[data-line-qty]')!.textContent = String(item.quantity);
