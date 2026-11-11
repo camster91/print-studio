@@ -12,6 +12,7 @@ local businesses, garage mounts, and custom builds on request.
 
 - `docs/business-plan.md` — products, pricing, production rules, 90-day plan
 - `docs/research-2026-11.md` — market, shipping, legal, licensing and production research
+- `docs/product-plan-100-month.md` — ten product types that can reach $100/month in sales, mapped to the catalogue, with gaps to test
 - `docs/catalog.md` — researched launch catalog, custom-order prices, photo shoot plan
 - `docs/design-direction.md` — design system, shop model, Figma screen list
 
