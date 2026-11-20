@@ -1,4 +1,5 @@
 ---
+import { products, money } from '../lib/products';
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="Studio admin" noindex>
@@ -8,6 +9,10 @@ import BaseLayout from '../layouts/BaseLayout.astro';
   <label>Month <input type="month" id="month" class="input" /></label>
   <div class="row wrap gap-12"><button class="btn btn--dark" data-kind="requests">Requests</button><button class="btn btn--dark" data-kind="orders">Paid orders</button><button class="btn btn--dark" data-kind="test-orders">Test orders</button><a id="export" class="btn" href="/api/admin/export">Download sales CSV</a></div>
   <p id="message" role="status"></p><div id="records" class="stack gap-16"></div><button id="more" class="btn" hidden>Load more</button>
+  <details><summary>Product catalogue ({products.length})</summary>
+    <label>Find a product <input class="input" id="catalogue-search" type="search" /></label>
+    <ul>{products.map(p => <li data-catalogue-row><a href={'/products/' + p.slug}>{p.name}</a> · {money(p.price)} · {p.category} · {p.productionReady ? 'Approved' : 'Sample testing'}</li>)}</ul>
+  </details>
   <h2 class="display-s">Monthly costs</h2>
   <p>Enter actual spend, postage paid and refunds for this month. Add missing Stripe fees below. Tax collected is excluded from profit. Review refunds and later fee changes against Stripe each month.</p>
   <form id="costs" class="stack gap-12">
@@ -30,6 +35,10 @@ const more = document.querySelector<HTMLButtonElement>('#more')!;
 let kind = 'requests'; let cursor: string | null = null;
 async function api(path: string, options?: RequestInit) { const r = await fetch(`/api/admin/${path}`,options); const b = await r.json(); if (!r.ok) throw new Error(b.error); return b; }
 const text = (tag: string, content: string) => { const el = document.createElement(tag); el.textContent = content; return el; };
+document.querySelector<HTMLInputElement>('#catalogue-search')!.addEventListener('input', e => {
+  const term = (e.currentTarget as HTMLInputElement).value.toLowerCase();
+  document.querySelectorAll<HTMLElement>('[data-catalogue-row]').forEach(row => { row.hidden = !row.textContent?.toLowerCase().includes(term); });
+});
 async function load(append = false) {
   try {
     const b = await api(`list?kind=${kind}&month=${month.value}${append && cursor ? `&cursor=${encodeURIComponent(cursor)}` : ''}`);
@@ -45,6 +54,43 @@ async function load(append = false) {
         const label = text('label','Production status '); const select = document.createElement('select'); select.setAttribute('aria-label',`Status for ${record.id}`);
         for (const v of ['new','quoted','approved','printing','done']) { const opt = new Option(v,v);opt.selected = v === record.status;select.add(opt); }
         select.addEventListener('change',async()=>{try {await api('status',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({id:record.id,status:select.value})});message.textContent='Status saved.';}catch(e){message.textContent=String(e);}});label.append(select);box.append(label);
+      }
+      if (record.sessionId) {
+        const heading = box.querySelector('h2')!;
+        const stage = document.createElement('select');
+        stage.setAttribute('aria-label', 'Production stage for ' + record.id);
+        for (const state of ['queued','printing','quality check','packed','shipped','ready for pickup','collected']) {
+          stage.add(new Option(state, state, false, state === record.status));
+        }
+        stage.addEventListener('change', async () => {
+          stage.disabled = true;
+          try {
+            const result = await api('order-stage', {method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({key:record.key,stage:stage.value,version:record.version})});
+            record.version = result.version;
+            record.status = stage.value;
+            heading.textContent = record.id + ' · ' + record.status;
+            message.textContent = 'Production stage saved.';
+          } catch (error) { stage.value = record.status; message.textContent = String(error); }
+          finally { stage.disabled = false; }
+        });
+        const print = document.createElement('button');
+        print.className = 'btn'; print.textContent = 'Print job sheet';
+        print.onclick = () => {
+          const sheet = window.open('', '_blank', 'width=800,height=700');
+          if (!sheet) { message.textContent = 'Allow the print window to open.'; return; }
+          sheet.opener = null;
+          sheet.document.title = 'Job sheet ' + record.id;
+          const page = sheet.document.body;
+          page.append(text('h1', record.live ? 'Production job sheet' : 'TEST ORDER — DO NOT PRINT PARTS'));
+          page.append(text('p', [record.id, record.paidAt, record.status, record.shippingChoice].filter(Boolean).join(' · ')));
+          for (const line of record.lines) {
+            page.append(text('h2', line.quantity + ' × ' + line.name));
+            for (const [name, value] of Object.entries(line.options ?? {})) page.append(text('p', name + ': ' + value));
+            for (const file of line.files ?? []) page.append(text('p', 'Artwork: ' + file));
+          }
+          sheet.focus(); sheet.print();
+        };
+        box.append(stage, print);
       }
       records.append(box);
     }
