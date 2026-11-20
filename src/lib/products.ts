@@ -6,7 +6,7 @@ export type SizeOption = { label: string; price: number; images?: string[] };
 /** A choice value: plain label, or a label that sets the price (`price`) or adds to it (`add`). */
 export type ChoiceValue = string | { label: string; price?: number; add?: number; images?: string[] };
 export type Choice = { name: string; values: ChoiceValue[] };
-export type Field = { name: string; label: string; placeholder?: string; max?: number; required?: boolean };
+export type Field = { name: string; label: string; placeholder?: string; max?: number; required?: boolean; requiredWhen?: { choice: string; value: string } };
 export { valueLabel, valuePrice, valueAdd, defaultValue } from './pricing';
 import { valuePrice } from './pricing';
 export type Product = {
