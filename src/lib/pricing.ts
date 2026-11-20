@@ -86,9 +86,12 @@ export function priceLine(products: Product[], input: LineInput): PricedLine {
   }
   if (product.options.size && !options.Size) options.Size = product.options.size.find((s) => s.price === product.price)?.label ?? product.options.size[0].label;
   for (const c of product.options.choices ?? []) if (!options[c.name]) options[c.name] = valueLabel(defaultValue(c, product.price));
-  for (const f of product.options.fields ?? []) if (f.required && !options[f.name]) throw new Error(`Please add the ${f.label.toLowerCase()} for your ${product.name}.`);
+  for (const f of product.options.fields ?? []) if ((f.required || (f.requiredWhen && options[f.requiredWhen.choice] === f.requiredWhen.value)) && !options[f.name]) throw new Error(`Please add the ${f.label.toLowerCase()} for your ${product.name}.`);
   if (product.type === 'made-to-order' && product.options.text && !options.Text) throw new Error(`Please add the text for your ${product.name}.`);
 
+  for (const [enabled, key] of [[product.options.link, 'Link'], [product.options.place, 'Place'], [product.options.drawer, 'Drawer']] as const) {
+    if (enabled && !options[key]) throw new Error(`Please add the ${key.toLowerCase()} for your ${product.name}.`);
+  }
   const files = (input.files ?? []).filter((f) => typeof f === 'string' && /^uploads\/[\w\-./]+$/.test(f) && !f.includes('..')).slice(0, 10);
   const unit = unitPrice(product, options, quantity);
   const setup = product.setupFee && files.length ? product.setupFee : 0;
