@@ -72,6 +72,8 @@ export const typeLabel: Record<ProductType, string> = {
 
 /** Copy shown on cards and product pages. Edit freely. */
 export const blurbs: Record<string, string> = {
+  'fold-vase': 'Prototype sculptural vase with an offset neck and a deep fold. Designed for a removable glass insert.',
+  'tide-centerpiece': 'Prototype oval decorative bowl with a rising rim, designed for a console or coffee table.',
   'battery-mounts': 'Click-in wall mounts for your tool batteries. Pick your brand. Screws included.',
   'tool-holders': 'Hang drills, drivers and saws by the battery slot. Pick your brand.',
   'skadis-hook-8-pack': 'Snap-in hooks for IKEA Skadis pegboards.',
@@ -112,6 +114,9 @@ export function specLabel(p: Product) {
 export const bySlug = (slug: string) => products.find((p) => p.slug === slug);
 
 export const filamentColours: Record<string, string> = {
+  'Deep Taupe': '#766457',
+  Chalk: '#e6e0d6',
+  Graphite: '#454443',
   Black: '#141414',
   White: '#f4f2ee',
   Grey: '#8e8b84',
