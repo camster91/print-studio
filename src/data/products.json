@@ -71,6 +71,12 @@
             "label": "Other brand or battery (optional)",
             "placeholder": "e.g. Metabo 18V, Flex 24V",
             "max": 40
+          },
+          {
+            "name": "Battery model",
+            "label": "Battery model number (optional)",
+            "placeholder": "e.g. 48-11-1850",
+            "max": 120
           }
         ]
       },
@@ -154,6 +160,12 @@
             "label": "Which tools? (optional)",
             "placeholder": "e.g. 2 drills, 1 impact, 1 circular saw",
             "max": 60
+          },
+          {
+            "name": "Tool model",
+            "label": "Tool model numbers (optional)",
+            "placeholder": "Use the model printed on each tool",
+            "max": 120
           }
         ]
       },
@@ -215,6 +227,14 @@
               "Cable clips"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Layout",
+            "label": "Items to hang (optional)",
+            "placeholder": "e.g. three cables and a pair of scissors",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -256,6 +276,14 @@
                 "add": 5
               }
             ]
+          }
+        ],
+        "fields": [
+          {
+            "name": "Clearance",
+            "label": "Available clearance under desk (mm) (optional)",
+            "placeholder": "Width × depth beside rails or drawers",
+            "max": 120
           }
         ]
       },
@@ -312,9 +340,13 @@
         "fields": [
           {
             "name": "Mix",
-            "label": "Mixed controllers (optional)",
+            "label": "Controller models and number of each",
             "placeholder": "e.g. 2 PS5, 2 Xbox",
-            "max": 40
+            "max": 40,
+            "requiredWhen": {
+              "choice": "Controller",
+              "value": "Mixed (tell us below)"
+            }
           }
         ]
       },
@@ -364,6 +396,14 @@
               "60°"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Cable routing",
+            "label": "Cable routing constraints (optional)",
+            "placeholder": "e.g. cable exits behind a monitor arm",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -408,6 +448,12 @@
             "label": "Sign text (optional)",
             "placeholder": "ON AIR, LIVE, RECORDING, IN A MEETING",
             "max": 14
+          },
+          {
+            "name": "Cable exit",
+            "label": "Preferred cable exit viewed from the front (optional)",
+            "placeholder": "e.g. bottom right",
+            "max": 120
           }
         ]
       },
@@ -453,6 +499,14 @@
               "Black",
               "No stand"
             ]
+          }
+        ],
+        "fields": [
+          {
+            "name": "Placement",
+            "label": "Base clearance or placement constraints (optional)",
+            "placeholder": "e.g. shelf is 180 mm tall",
+            "max": 120
           }
         ]
       },
@@ -507,6 +561,14 @@
               }
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Panel order",
+            "label": "Photo arrangement (optional)",
+            "placeholder": "Identify the front photo and list the others clockwise",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -544,6 +606,14 @@
               "White",
               "Grey"
             ]
+          }
+        ],
+        "fields": [
+          {
+            "name": "Crop",
+            "label": "Photo cropping instructions (optional)",
+            "placeholder": "e.g. include both ears and the collar",
+            "max": 120
           }
         ]
       },
@@ -599,6 +669,14 @@
               "Desk stand"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Cable exit",
+            "label": "Preferred cable exit viewed from the front (optional)",
+            "placeholder": "e.g. left side nearest the outlet",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -632,6 +710,14 @@
               "Script",
               "Block"
             ]
+          }
+        ],
+        "fields": [
+          {
+            "name": "Headband",
+            "label": "Headband width (mm) (optional)",
+            "placeholder": "Measure across the top of the headband",
+            "max": 120
           }
         ]
       },
@@ -679,6 +765,12 @@
             "label": "Second line (optional)",
             "placeholder": "Title, team or room",
             "max": 30
+          },
+          {
+            "name": "Text layout",
+            "label": "Text alignment preference (optional)",
+            "placeholder": "e.g. centre the name above the title",
+            "max": 120
           }
         ]
       },
@@ -719,6 +811,14 @@
             "values": [
               "Plain"
             ]
+          }
+        ],
+        "fields": [
+          {
+            "name": "Space",
+            "label": "Available wall space (mm) (optional)",
+            "placeholder": "Width × height",
+            "max": 120
           }
         ]
       },
@@ -772,6 +872,14 @@
               "Arch"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Call to action",
+            "label": "Words to print above the code (optional)",
+            "placeholder": "e.g. Scan to see our menu",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -813,6 +921,14 @@
               "No frame"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Map centre",
+            "label": "Map centre or coordinates (optional)",
+            "placeholder": "e.g. latitude and longitude of the cottage",
+            "max": 120
+          }
         ]
       },
       "credit": "Elevation data: Natural Resources Canada (CDEM)",
@@ -849,6 +965,14 @@
               "Kitchen utensils"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Obstructions",
+            "label": "Drawer obstructions and clearances (mm) (optional)",
+            "placeholder": "e.g. rear left hinge projects 12 mm",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -868,6 +992,14 @@
           "Deep Taupe",
           "Chalk",
           "Graphite"
+        ],
+        "fields": [
+          {
+            "name": "Display space",
+            "label": "Available shelf height (mm) (optional)",
+            "placeholder": "Include clearance for stems if needed",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
@@ -887,6 +1019,14 @@
           "Deep Taupe",
           "Chalk",
           "Graphite"
+        ],
+        "fields": [
+          {
+            "name": "Display space",
+            "label": "Available tabletop area (mm) (optional)",
+            "placeholder": "Width × depth of the display area",
+            "max": 120
+          }
         ]
       },
       "productionReady": false
