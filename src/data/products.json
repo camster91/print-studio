@@ -852,6 +852,44 @@
         ]
       },
       "productionReady": false
+    },
+    {
+      "slug": "fold-vase",
+      "name": "Fold Vase · 23 cm",
+      "type": "made-to-order",
+      "category": "home",
+      "price": 175,
+      "materialCost": 18,
+      "printHours": 8,
+      "material": "PLA",
+      "colours": 1,
+      "options": {
+        "colour": [
+          "Deep Taupe",
+          "Chalk",
+          "Graphite"
+        ]
+      },
+      "productionReady": false
+    },
+    {
+      "slug": "tide-centerpiece",
+      "name": "Tide Centrepiece · 21 cm",
+      "type": "made-to-order",
+      "category": "home",
+      "price": 145,
+      "materialCost": 12,
+      "printHours": 6,
+      "material": "PLA",
+      "colours": 1,
+      "options": {
+        "colour": [
+          "Deep Taupe",
+          "Chalk",
+          "Graphite"
+        ]
+      },
+      "productionReady": false
     }
   ],
   "phase2": [
