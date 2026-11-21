@@ -10,6 +10,7 @@
  *   UPLOADS            R2 bucket for files and requests
  *   SEND_EMAIL         optional Email Routing binding; NOTIFY_TO = your verified address
  */
+import { paymentEnv } from './payment-settings.ts';
 import data from '../src/data/products.json';
 import { stripeWebhook, orderStatus } from './stripe';
 import { adminApi, authoriseAdmin } from './admin';
@@ -19,6 +20,7 @@ import type { Product } from '../src/lib/products';
 interface SendEmail { send(message: unknown): Promise<void> }
 export interface Env {
   ASSETS: { fetch(req: Request): Promise<Response> };
+  PAYMENT_SETTINGS_KEY?: string;
   STRIPE_SECRET_KEY?: string;
   STRIPE_WEBHOOK_SECRET?: string;
   ACCESS_TEAM_DOMAIN?: string;
@@ -49,16 +51,16 @@ export default {
     }
     if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(req);
     try {
-      if (url.pathname === '/api/stripe-webhook' && req.method === 'POST') return await stripeWebhook(req, env);
+      if (url.pathname === '/api/stripe-webhook' && req.method === 'POST') return await stripeWebhook(req, await paymentEnv(env));
       if (url.pathname.startsWith('/api/admin/')) return await adminApi(req, env, url);
-      if (url.pathname === '/api/order-status' && req.method === 'GET') return await orderStatus(url, env);
+      if (url.pathname === '/api/order-status' && req.method === 'GET') return await orderStatus(url, await paymentEnv(env));
     } catch (e) { console.error('Private API or payment processing failed'); return json({ error: 'Please retry shortly.' }, 500); }
     if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
     // Same-origin only (blocks other sites posting to these endpoints).
     const origin = req.headers.get('origin');
     if (origin && new URL(origin).host !== url.host) return json({ error: 'Forbidden' }, 403);
     try {
-      if (url.pathname === '/api/checkout') return await checkout(req, env, url);
+      if (url.pathname === '/api/checkout') return await checkout(req, await paymentEnv(env), url);
       if (url.pathname === '/api/upload') return await upload(req, env);
       if (url.pathname === '/api/quote') return await quote(req, env);
       return json({ error: 'Not found' }, 404);

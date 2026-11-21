@@ -6,6 +6,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 <section class="container section admin">
   <h1 class="display-m">Studio desk</h1>
   <p>Private. Figures are CAD. Test orders never count towards profit.</p>
+  <a href="/api/admin/payment-settings">Manage payment settings</a>
   <label>Month <input type="month" id="month" class="input" /></label>
   <div class="row wrap gap-12"><button class="btn btn--dark" data-kind="requests">Requests</button><button class="btn btn--dark" data-kind="orders">Paid orders</button><button class="btn btn--dark" data-kind="test-orders">Test orders</button><a id="export" class="btn" href="/api/admin/export">Download sales CSV</a></div>
   <p id="message" role="status"></p><div id="records" class="stack gap-16"></div><button id="more" class="btn" hidden>Load more</button>

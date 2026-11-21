@@ -1,3 +1,4 @@
+import { paymentSettings } from './payment-settings.ts';
 import { createRemoteJWKSet, jwtVerify } from 'jose';
 import type { Env } from './index.ts';
 import { jsonResponse, type PaidOrder } from './stripe.ts';
@@ -25,6 +26,7 @@ export async function adminApi(req: Request, env: Env, url: URL) {
   const bucket = env.UPLOADS;
   if (req.method !== 'GET' && req.headers.get('origin') !== url.origin) return jsonResponse({ error: 'Forbidden' }, 403);
   const route = url.pathname.slice('/api/admin/'.length);
+  if (route === 'payment-settings') return paymentSettings(req, env);
   if (route === 'file' && req.method === 'GET') {
     const key = url.searchParams.get('key') ?? '';
     if (!/^(uploads|request-files|requests|orders|test-orders)\/[a-zA-Z0-9_./-]+$/.test(key) || key.includes('..')) return jsonResponse({ error: 'Invalid file' }, 400);
