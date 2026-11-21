@@ -83,14 +83,17 @@
       "optionImages": {
         "Brand": {
           "Milwaukee M18": [
-            "/renders/m18-battery-mount-5-pack.webp"
+            "/renders/m18-battery-mount-5-pack.webp",
+            "/renders/variants/battery-mounts-1.jpg"
           ],
           "DeWalt 20V MAX": [
-            "/renders/dewalt-20v-battery-mount-6-pack.webp"
+            "/renders/dewalt-20v-battery-mount-6-pack.webp",
+            "/renders/variants/battery-mounts-2.jpg"
           ]
         }
       },
-      "productionReady": false
+      "productionReady": false,
+      "acceptMadeToOrder": true
     },
     {
       "slug": "tool-holders",
@@ -172,11 +175,16 @@
       "optionImages": {
         "Brand": {
           "Ryobi ONE+": [
-            "/renders/ryobi-tool-holder-5-pack.webp"
+            "/renders/ryobi-tool-holder-5-pack.webp",
+            "/renders/variants/tool-holders-1.jpg"
+          ],
+          "Makita 18V LXT": [
+            "/renders/variants/tool-holders-2.jpg"
           ]
         }
       },
-      "productionReady": false
+      "productionReady": false,
+      "acceptMadeToOrder": true
     },
     {
       "slug": "skadis-hook-8-pack",
@@ -237,7 +245,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Hook mix": {
+          "Straight hooks": [
+            "/renders/variants/skadis-hook-8-pack-1.jpg"
+          ],
+          "Cable clips": [
+            "/renders/variants/skadis-hook-8-pack-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "under-desk-headphone-hook",
@@ -287,7 +306,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Style": {
+          "Single hook": [
+            "/renders/variants/under-desk-headphone-hook-1.jpg"
+          ],
+          "Double hook": [
+            "/renders/variants/under-desk-headphone-hook-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "controller-wall-mount-4-pack",
@@ -350,7 +380,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Controller": {
+          "PS5 DualSense": [
+            "/renders/variants/controller-wall-mount-4-pack-1.jpg"
+          ],
+          "Xbox Series": [
+            "/renders/variants/controller-wall-mount-4-pack-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "stream-deck-stand",
@@ -406,7 +447,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Angle": {
+          "30°": [
+            "/renders/variants/stream-deck-stand-1.jpg"
+          ],
+          "60°": [
+            "/renders/variants/stream-deck-stand-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "on-air-light-box",
@@ -457,7 +509,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Red / Black": [
+            "/renders/variants/on-air-light-box-1.jpg"
+          ],
+          "White / Black": [
+            "/renders/variants/on-air-light-box-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "moon-lamp-10cm",
@@ -510,7 +573,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Stand": {
+          "Light wood": [
+            "/renders/variants/moon-lamp-10cm-1.jpg"
+          ],
+          "Black": [
+            "/renders/variants/moon-lamp-10cm-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "lithophane-photo-box",
@@ -571,7 +645,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Frame colour": {
+          "Black": [
+            "/renders/variants/lithophane-photo-box-1.jpg"
+          ],
+          "White": [
+            "/renders/variants/lithophane-photo-box-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "pet-memorial-light",
@@ -617,7 +702,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Shape": {
+          "Circle": [
+            "/renders/variants/pet-memorial-light-1.jpg"
+          ],
+          "Heart": [
+            "/renders/variants/pet-memorial-light-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "led-name-sign",
@@ -679,7 +775,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Black / Cyan": [
+            "/renders/variants/led-name-sign-1.jpg"
+          ],
+          "Black / Magenta": [
+            "/renders/variants/led-name-sign-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "personalised-headphone-stand",
@@ -721,7 +828,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Font": {
+          "Script": [
+            "/renders/variants/personalised-headphone-stand-1.jpg"
+          ],
+          "Block": [
+            "/renders/variants/personalised-headphone-stand-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "desk-nameplate",
@@ -774,11 +892,24 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Style": {
+          "Wedge": [
+            "/renders/variants/desk-nameplate-1.jpg"
+          ],
+          "Flat with stand": [
+            "/renders/variants/desk-nameplate-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "wall-name-sign",
-      "images": [],
+      "images": [
+        "/renders/variants/wall-name-sign-1.jpg"
+      ],
       "name": "Wall Name Sign",
       "type": "made-to-order",
       "category": "gifts",
@@ -823,7 +954,18 @@
         ]
       },
       "safety": "Wall decor for adults. Securely mount away from heat. Not a toy or a children’s product.",
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Font": {
+          "Script": [
+            "/renders/variants/wall-name-sign-1.jpg"
+          ],
+          "Block": [
+            "/renders/variants/wall-name-sign-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "qr-review-stand",
@@ -882,7 +1024,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Shape": {
+          "Rectangle": [
+            "/renders/variants/qr-review-stand-1.jpg"
+          ],
+          "Arch": [
+            "/renders/variants/qr-review-stand-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "cottage-lake-topo-map",
@@ -932,7 +1085,18 @@
         ]
       },
       "credit": "Elevation data: Natural Resources Canada (CDEM)",
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Frame": {
+          "Natural wood": [
+            "/renders/variants/cottage-lake-topo-map-1.jpg"
+          ],
+          "Black": [
+            "/renders/variants/cottage-lake-topo-map-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "gridfinity-drawer-kit",
@@ -975,7 +1139,18 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Bin mix": {
+          "Small parts": [
+            "/renders/variants/gridfinity-drawer-kit-1.jpg"
+          ],
+          "Tools": [
+            "/renders/variants/gridfinity-drawer-kit-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "fold-vase",
@@ -1002,7 +1177,24 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Chalk": [
+            "/renders/variants/fold-vase-1.jpg"
+          ],
+          "Graphite": [
+            "/renders/variants/fold-vase-2.jpg"
+          ],
+          "Deep Taupe": [
+            "/renders/variants/vase-hero-1.jpg"
+          ]
+        }
+      },
+      "images": [
+        "/renders/variants/vase-hero-1.jpg"
+      ],
+      "acceptMadeToOrder": true
     },
     {
       "slug": "tide-centerpiece",
@@ -1029,7 +1221,21 @@
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Deep Taupe": [
+            "/renders/variants/tide-centerpiece-1.jpg"
+          ],
+          "Chalk": [
+            "/renders/variants/tide-centerpiece-2.jpg"
+          ]
+        }
+      },
+      "images": [
+        "/renders/variants/tide-centerpiece-1.jpg"
+      ],
+      "acceptMadeToOrder": true
     }
   ],
   "phase2": [

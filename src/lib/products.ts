@@ -12,6 +12,7 @@ import { valuePrice } from './pricing';
 export type Product = {
   slug: string;
   productionReady?: boolean;
+  acceptMadeToOrder?: boolean;
   name: string;
   fits?: string;
   type: ProductType;
