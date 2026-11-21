@@ -10,6 +10,8 @@ local businesses, garage mounts, and custom builds on request.
 
 ## Docs
 
+- [Studio expansion plan](docs/studio-expansion.md) tracks deployed features, payment and P2S verification, and the production backlog.
+
 - `docs/business-plan.md` — products, pricing, production rules, 90-day plan
 - `docs/research-2026-11.md` — market, shipping, legal, licensing and production research
 - `docs/product-plan-100-month.md` — ten product types that can reach $100/month in sales, mapped to the catalogue, with gaps to test
@@ -61,22 +63,20 @@ Uploads and quote requests are stored in a local R2 simulation while developing.
 - **Uploads + requests:** R2 bucket `layerline-uploads`.
 - **Request emails:** Email Routing is on for layerline.ca. `hello@layerline.ca` forwards to cameron@ashbi.ca, and
   every `/api/quote` request is emailed to `NOTIFY_TO` from `requests@layerline.ca`.
-- **Stripe:** add `STRIPE_SECRET_KEY` as a **Secret** on the Worker (dashboard → Workers → layerline → Settings →
-  Variables and Secrets). Use `sk_test_…` first, then swap to `sk_live_…`. Until it's set, checkout shows a friendly
-  "not switched on yet" message.
-- **Photos:** `public/renders/` holds AI preview images (made with Higgsfield). They show a small "Preview image"
+- **Stripe:** The owner can save live credentials in [studio payment settings](https://layerline.ca/api/admin/payment-settings). Existing Worker secrets are the fallback. Test credentials belong in development or test environments.
+- **Photos:** `public/renders/` holds AI preview images. They show a small "Preview image"
   tag. Replace them with real photos in `public/products/<slug>/` and update `images` in `products.json`.
 
-### Launch work (Nov 4)
+### Launch status
 
-The full 17-product catalogue remains visible as sample-testing previews. Cameron chose a **separate Layerline Stripe account**; it must be created/activated by him before live keys are connected. Live checkout requires `TAX_READY=true` after tax setup and `productionReady: true` on each verified product. All products remain made to order until actual stock is known. Do not enable these flags just to make checkout pass.
+The shop lists 19 made-to-order products. Checkout accepts a sample-approved product or a made-to-order product explicitly enabled for sale. Live payments also require the studio’s live credentials, webhook configuration and tax readiness. The latest verification and remaining work are recorded in the [studio plan](docs/studio-expansion.md).
 
 - `docs/launch/cameron-checklist.md`: exact physical/account decisions.
 - `docs/launch/`: pricing/sample/outreach CSVs, eight Etsy drafts, social plan, shipping plan, quote/proof/review emails, SEO steps and market/promo brief. Draft communications require Cameron's approval.
 - `output/pdf/layerline-counter-card.pdf`: two-up letter-size draft card, approve prices before distribution.
 - `models/`: original parametric CAD + rendered prototype STLs, awaiting physical testing.
 - `/admin/`: Cloudflare Access + verified JWT, Cameron only. Request statuses, protected file downloads, monthly sales CSV, actual-cost entry, provisional net and quote calculator. API also validates JWT; workers.dev cannot bypass it.
-- `POST /api/stripe-webhook`: raw Stripe signature verification; only paid source=layerline sessions; full R2 print record; test/live logs isolated; retried mail on failure. Set `STRIPE_WEBHOOK_SECRET` only as a Worker secret. Register the two Checkout completion events in test, then in the new live account.
+- `POST /api/stripe-webhook`: raw Stripe signature verification; only paid source=layerline sessions; full R2 print record; test/live logs isolated; retried mail on failure. Save the live signing secret in private payment settings or configure its Worker-secret fallback. Register the two Checkout completion events in test, then in the new live account.
 - Webhook is at-least-once: an extremely rare crash after email delivery but before saving its marker can send a duplicate. A persistent session index and conditional email lock keep one order record across month-boundary events, including after checkout drafts expire. Stale locks expire after one day. Reconcile against Stripe; do not auto-print twice.
 - Privacy lifecycle: artwork uploads, request-files, requests and unpaid snapshots expire after 90 days. Paid order records have no lifecycle expiry and must be retained at least six years. Never add a whole-bucket expiry.
 - Refunds/postage/parts and missing fees are entered in admin for monthly profit; figures remain provisional until reconciled. Custom invoices are reviewed/sent from Stripe, not automatically charged from admin.
