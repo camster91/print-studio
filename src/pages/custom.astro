@@ -30,6 +30,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 
   <div class="container body">
     <form class="card-form" data-build novalidate>
+      <label class="field" data-source-product hidden>Starting design<input class="input" name="startingDesign" readonly /></label>
       <!-- 1 -->
       <fieldset class="step" data-step-panel="0">
         <legend class="label-l">What are we making?</legend>
@@ -162,6 +163,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 </BaseLayout>
 
 <script>
+  import { bySlug } from '../lib/products';
   import { submitQuote } from '../lib/quote';
   import { lenis } from '../lib/motion';
 
@@ -185,6 +187,10 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
       els.forEach((el) => { if (el.type === 'radio' || el.type === 'checkbox') el.checked = el.value === v; else if (el.type !== 'file') el.value = String(v); });
     }
   } catch {}
+  const sourceField = form.querySelector<HTMLInputElement>('[name="startingDesign"]')!;
+  const requestedSlug = new URLSearchParams(location.search).get('product');
+  if (requestedSlug) sourceField.value = bySlug(requestedSlug)?.name ?? '';
+  sourceField.closest<HTMLElement>('[data-source-product]')!.hidden = !sourceField.value;
   const typeParam = new URLSearchParams(location.search).get('type');
   if (typeParam) form.querySelectorAll<HTMLInputElement>('[name="type"]').forEach((r) => (r.checked = r.value === typeParam));
 

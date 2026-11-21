@@ -39,6 +39,18 @@ export async function adminApi(req: Request, env: Env, url: URL) {
     await bucket.put(`statuses/${body.id}.json`, JSON.stringify({ status: body.status, updatedAt: new Date().toISOString() }));
     return jsonResponse({ saved: true });
   }
+  if (route === 'order-stage' && req.method === 'POST') {
+    const body = await req.json().catch(() => null) as { key?: string; stage?: string; version?: string } | null;
+    if (!body?.key || !/^(test-orders|orders)\/20\d{2}-(0[1-9]|1[0-2])\/cs_[A-Za-z0-9_]+\.json$/.test(body.key) ||
+        !['queued','printing','quality check','packed','shipped','ready for pickup','collected'].includes(body.stage ?? '') ||
+        typeof body.version !== 'string') return jsonResponse({ error: 'Invalid production update' }, 400);
+    if (!await bucket.head(body.key)) return jsonResponse({ error: 'Order not found' }, 404);
+    const saved = await bucket.put('production/' + body.key, JSON.stringify({ status: body.stage }), {
+      onlyIf: body.version ? { etagMatches: body.version } : { etagDoesNotMatch: '*' }
+    });
+    if (!saved) return jsonResponse({ error: 'Order changed. Reload the order and try again.' }, 409);
+    return jsonResponse({ version: saved.etag });
+  }
   const month = url.searchParams.get('month') ?? new Date().toISOString().slice(0, 7);
   if (!/^20\d{2}-(0[1-9]|1[0-2])$/.test(month)) return jsonResponse({ error: 'Invalid month' }, 400);
   if (route === 'expense' && req.method === 'POST') {
@@ -61,8 +73,8 @@ export async function adminApi(req: Request, env: Env, url: URL) {
     const records = await Promise.all(keys.map(async o => {
       const obj = await bucket.get(o.key); if (!obj) return null;
       const record = await obj.json<Record<string, unknown>>();
-      const status = record.id ? await bucket.get(`statuses/${record.id}.json`) : null;
-      return { ...record, createdAt: record.createdAt, receivedAt: record.receivedAt, status: status ? (await status.json<{ status: string }>()).status : 'new', key: o.key };
+      const status = kind !== 'requests' ? await bucket.get('production/' + o.key) : record.id ? await bucket.get(`statuses/${record.id}.json`) : null;
+      return { ...record, createdAt: record.createdAt, receivedAt: record.receivedAt, version: status?.etag ?? '', status: status ? (await status.json<{ status: string }>()).status : (kind === 'requests' ? 'new' : 'queued'), key: o.key };
     }));
     return jsonResponse({ records: records.filter(Boolean).sort((a, b) => String(b?.createdAt ?? b?.receivedAt).localeCompare(String(a?.createdAt ?? a?.receivedAt))), cursor: listing.truncated ? listing.cursor : null });
   }

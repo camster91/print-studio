@@ -54,7 +54,7 @@ const details = [
       data-sizes={JSON.stringify(p.options.size ?? [])} data-addons={JSON.stringify(p.addOns ?? [])} data-bulk={JSON.stringify(p.bulk ?? [])} data-setup={p.setupFee ?? 0} data-choices={JSON.stringify(choices)}>
       <div class="row gap-12 wrap"><span class={`badge badge--${p.type}`}>{typeLabel[p.type]}</span><span class="mono-s kicker">{audience[p.category]}</span></div>
       <h1 class="display-l">{p.name}</h1>
-      {!p.productionReady && <p class="note body-s">Sample testing in progress. Images are previews. Live ordering opens after production checks; you can request a quote now.</p>}
+      {!p.productionReady && !p.acceptMadeToOrder && <p class="note body-s">Sample testing in progress. Images are previews. Live ordering opens after production checks; you can request a quote now.</p>}
       <p class="row gap-12" style="align-items:baseline"><span class="display-m" data-price>{money(startPrice)}</span><span class="body-m">CAD · free Toronto pickup</span></p>
       <p class="body-l">{blurbs[p.slug]}{p.fits && ` Fits ${p.fits}.`}</p>
 
@@ -75,6 +75,15 @@ const details = [
           </fieldset>
         );
       })}
+
+      {Object.entries(p.optionImages ?? {}).map(([name, variations]) => (
+        <details class="opt">
+          <summary class="label-l">Compare {name.toLowerCase()} previews</summary>
+          <div class="variant-examples">{Object.entries(variations).map(([label, images]) => (
+            <figure><img loading="lazy" decoding="async" src={images[images.length - 1]} alt={p.name + ' — ' + label + ' concept preview'} /><figcaption>{label}</figcaption></figure>
+          ))}</div>
+        </details>
+      ))}
 
       {colours.length > 0 && (
         <fieldset class="opt"><legend class="mono-s">{colourKey}: <span data-colour-name>{colours[0]}</span></legend>
@@ -99,8 +108,9 @@ const details = [
         <div class="field opt"><label for="opt-link">Where should the QR go?</label><input id="opt-link" class="input" name="Link" maxlength="500" required placeholder="Google review, booking or menu link" /></div>
       )}
 
-      {fields.map((f) => (
-        <div class="field opt"><label for={`opt-${f.name}`}>{f.label}</label><input id={`opt-${f.name}`} class="input" name={f.name} maxlength={f.max ?? 60} required={f.required} placeholder={f.placeholder} /></div>
+      {fields.length > 0 && <h2 class="label-l">Print details</h2>}
+      {fields.map((f, i) => (
+        <div class="field opt"><label for={`print-detail-${i}`}>{f.label}</label><input id={`print-detail-${i}`} class="input" name={f.name} data-condition-choice={f.requiredWhen?.choice} data-condition-value={f.requiredWhen?.value} maxlength={f.max ?? 60} required={f.required} placeholder={f.placeholder} /></div>
       ))}
 
       {(photoCount > 0 || needsLogo) && (
@@ -125,6 +135,7 @@ const details = [
       {mto && <label class="check"><input type="checkbox" data-gift /> Add a gift note (free)</label>}
       <div class="field opt" data-gift-field hidden><label for="gift">Gift note</label><textarea id="gift" class="textarea" name="Gift note" maxlength="200"></textarea></div>
 
+      <p class="body-s">Need a different size, a new design, or a print from your own file? <a href={`/custom?product=${p.slug}`}>Request a custom version of {p.name}</a>.</p>
       <div class="buy__row">
         <div class="qty" role="group" aria-label="Quantity"><button type="button" data-q="-1" aria-label="One fewer">–</button><output data-qty>1</output><button type="button" data-q="1" aria-label="One more">+</button></div>
         <button class="btn btn--primary buy__add" data-add>Add to bag · <span data-total>{money(startPrice)}</span></button>
@@ -205,6 +216,17 @@ const details = [
     const name = form.querySelector('[data-colour-name]');
     if (colour && name) name.textContent = colour.value;
   };
+  function updateConditionalFields() {
+    const selected = new FormData(form);
+    for (const input of form.querySelectorAll<HTMLInputElement>('[data-condition-choice]')) {
+      const applies = selected.get(input.dataset.conditionChoice!) === input.dataset.conditionValue;
+      input.disabled = !applies;
+      input.required = applies;
+      input.closest<HTMLElement>('.field')!.hidden = !applies;
+    }
+  }
+  form.addEventListener('change', updateConditionalFields);
+  updateConditionalFields();
   const selectedProduct = bySlug(d.slug!)!;
   const gallery = document.querySelector<HTMLElement>('.gallery') as HTMLElement & {swiper?:Swiper};
   const thumbs = document.querySelector<HTMLElement>('.thumbs')!;
@@ -287,6 +309,10 @@ const details = [
 </script>
 
 <style>
+  .variant-examples { display:grid; grid-template-columns:repeat(auto-fit,minmax(110px,1fr)); gap:12px; margin-top:12px }
+  .variant-examples figure { margin:0 }
+  .variant-examples img { width:100%; aspect-ratio:1; object-fit:contain; background:#f6f3ed; border-radius:8px }
+
   .crumbs { padding-block: 28px; color: var(--muted); }
   .crumbs a:hover { color: var(--ink); }
   .pdp { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 64px; padding-bottom: 96px; align-items: start; }

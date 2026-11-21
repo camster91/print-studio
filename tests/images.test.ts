@@ -9,8 +9,8 @@ test('an unmapped battery brand cannot show a different brand photo',()=>{
  assert.deepEqual(productImages(battery,{Brand:'Bosch 18V'}),[]);
 });
 test('default and chosen brands use only matching gallery images',()=>{
- assert.deepEqual(productImages(battery),['/renders/m18-battery-mount-5-pack.webp']);
- assert.deepEqual(productImages(battery,{Brand:'DeWalt 20V MAX'}),['/renders/dewalt-20v-battery-mount-6-pack.webp']);
+ assert.deepEqual(productImages(battery),['/renders/m18-battery-mount-5-pack.webp','/renders/variants/battery-mounts-1.jpg']);
+ assert.deepEqual(productImages(battery,{Brand:'DeWalt 20V MAX'}),['/renders/dewalt-20v-battery-mount-6-pack.webp','/renders/variants/battery-mounts-2.jpg']);
 });
 test('choice and size images work in the product gallery and bag',()=>{
  const product={...battery,optionImages:{},options:{size:[{label:'Small',price:28,images:['/products/small.jpg','/products/small-detail.jpg']},{label:'Large',price:49,images:['/products/large.jpg']}]}};
@@ -19,5 +19,5 @@ test('choice and size images work in the product gallery and bag',()=>{
 });
 test('a product without variant photography still has its own base photos',()=>{
  const product=products.find(p=>p.slug==='qr-review-stand')!;
- assert.deepEqual(productImages(product,{Shape:'Arch'}),product.images);
+ assert.deepEqual(productImages({...product,optionImages:{}},{Shape:'Arch'}),product.images);
 });

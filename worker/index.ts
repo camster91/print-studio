@@ -130,7 +130,6 @@ export function buildCheckoutParams(lines: PricedLine[], origin: string, env: Pi
 }
 
 async function checkout(req: Request, env: Env, url: URL) {
-  if (env.STRIPE_SECRET_KEY?.startsWith('sk_live_') && env.TAX_READY !== 'true') return json({ error: 'Live checkout is awaiting the studio’s tax setup. Please request a quote.' }, 503);
   if (!env.UPLOADS) return json({ error: 'Order records are not available. Please try later.' }, 503);
   if (!env.STRIPE_SECRET_KEY) return json({ error: 'Checkout isn’t switched on yet. Please email us to order.' }, 503);
   const body = (await req.json().catch(() => null)) as { items?: unknown[]; attribution?: Record<string, string> } | null;
@@ -139,7 +138,15 @@ async function checkout(req: Request, env: Env, url: URL) {
   const lines = body.items.map((it) => {
     try { return priceLine(products, it as Parameters<typeof priceLine>[1]); } catch (e) { throw new UserError((e as Error).message); }
   });
-  if (env.STRIPE_SECRET_KEY.startsWith('sk_live_') && lines.some(l=>!l.product.productionReady)) return json({ error: 'This product is still in sample testing. Please request a quote.' }, 409);
+  const live = env.STRIPE_SECRET_KEY.startsWith('sk_live_');
+  if (['layerline.ca','www.layerline.ca'].includes(url.hostname) && !live) return json({ error: 'Live payments are unavailable. Please contact the studio.' }, 503);
+  if (live && !env.STRIPE_WEBHOOK_SECRET) return json({ error: 'Order confirmation is unavailable.' }, 503);
+  if (live && env.TAX_READY !== 'true') {
+    const response = await fetch('https://api.stripe.com/v1/tax/settings', { headers: { authorization: `Bearer ${env.STRIPE_SECRET_KEY}` } });
+    const settings = await response.json() as { status?: string; livemode?: boolean };
+    if (!response.ok || !settings.livemode || settings.status !== 'active') return json({ error: 'Live checkout is awaiting the studio’s Stripe tax setup.' }, 503);
+  }
+  if (live && lines.some(l => !l.product.productionReady && !(l.product.type === 'made-to-order' && l.product.acceptMadeToOrder))) return json({ error: 'This product is still in sample testing. Please request a quote.' }, 409);
   const attribution = Object.fromEntries(Object.entries(body.attribution ?? {}).filter(([k]) => /^(utm_\w+|fbclid|gclid|ttclid)$/.test(k)));
   const params = buildCheckoutParams(lines, url.origin, env, attribution);
   const id = `LL-${crypto.randomUUID()}`;

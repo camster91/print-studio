@@ -71,20 +71,29 @@
             "label": "Other brand or battery (optional)",
             "placeholder": "e.g. Metabo 18V, Flex 24V",
             "max": 40
+          },
+          {
+            "name": "Battery model",
+            "label": "Battery model number (optional)",
+            "placeholder": "e.g. 48-11-1850",
+            "max": 120
           }
         ]
       },
       "optionImages": {
         "Brand": {
           "Milwaukee M18": [
-            "/renders/m18-battery-mount-5-pack.webp"
+            "/renders/m18-battery-mount-5-pack.webp",
+            "/renders/variants/battery-mounts-1.jpg"
           ],
           "DeWalt 20V MAX": [
-            "/renders/dewalt-20v-battery-mount-6-pack.webp"
+            "/renders/dewalt-20v-battery-mount-6-pack.webp",
+            "/renders/variants/battery-mounts-2.jpg"
           ]
         }
       },
-      "productionReady": false
+      "productionReady": false,
+      "acceptMadeToOrder": true
     },
     {
       "slug": "tool-holders",
@@ -154,17 +163,28 @@
             "label": "Which tools? (optional)",
             "placeholder": "e.g. 2 drills, 1 impact, 1 circular saw",
             "max": 60
+          },
+          {
+            "name": "Tool model",
+            "label": "Tool model numbers (optional)",
+            "placeholder": "Use the model printed on each tool",
+            "max": 120
           }
         ]
       },
       "optionImages": {
         "Brand": {
           "Ryobi ONE+": [
-            "/renders/ryobi-tool-holder-5-pack.webp"
+            "/renders/ryobi-tool-holder-5-pack.webp",
+            "/renders/variants/tool-holders-1.jpg"
+          ],
+          "Makita 18V LXT": [
+            "/renders/variants/tool-holders-2.jpg"
           ]
         }
       },
-      "productionReady": false
+      "productionReady": false,
+      "acceptMadeToOrder": true
     },
     {
       "slug": "skadis-hook-8-pack",
@@ -215,9 +235,28 @@
               "Cable clips"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Layout",
+            "label": "Items to hang (optional)",
+            "placeholder": "e.g. three cables and a pair of scissors",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Hook mix": {
+          "Straight hooks": [
+            "/renders/variants/skadis-hook-8-pack-1.jpg"
+          ],
+          "Cable clips": [
+            "/renders/variants/skadis-hook-8-pack-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "under-desk-headphone-hook",
@@ -257,9 +296,28 @@
               }
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Clearance",
+            "label": "Available clearance under desk (mm) (optional)",
+            "placeholder": "Width × depth beside rails or drawers",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Style": {
+          "Single hook": [
+            "/renders/variants/under-desk-headphone-hook-1.jpg"
+          ],
+          "Double hook": [
+            "/renders/variants/under-desk-headphone-hook-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "controller-wall-mount-4-pack",
@@ -312,13 +370,28 @@
         "fields": [
           {
             "name": "Mix",
-            "label": "Mixed controllers (optional)",
+            "label": "Controller models and number of each",
             "placeholder": "e.g. 2 PS5, 2 Xbox",
-            "max": 40
+            "max": 40,
+            "requiredWhen": {
+              "choice": "Controller",
+              "value": "Mixed (tell us below)"
+            }
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Controller": {
+          "PS5 DualSense": [
+            "/renders/variants/controller-wall-mount-4-pack-1.jpg"
+          ],
+          "Xbox Series": [
+            "/renders/variants/controller-wall-mount-4-pack-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "stream-deck-stand",
@@ -364,9 +437,28 @@
               "60°"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Cable routing",
+            "label": "Cable routing constraints (optional)",
+            "placeholder": "e.g. cable exits behind a monitor arm",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Angle": {
+          "30°": [
+            "/renders/variants/stream-deck-stand-1.jpg"
+          ],
+          "60°": [
+            "/renders/variants/stream-deck-stand-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "on-air-light-box",
@@ -408,10 +500,27 @@
             "label": "Sign text (optional)",
             "placeholder": "ON AIR, LIVE, RECORDING, IN A MEETING",
             "max": 14
+          },
+          {
+            "name": "Cable exit",
+            "label": "Preferred cable exit viewed from the front (optional)",
+            "placeholder": "e.g. bottom right",
+            "max": 120
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Red / Black": [
+            "/renders/variants/on-air-light-box-1.jpg"
+          ],
+          "White / Black": [
+            "/renders/variants/on-air-light-box-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "moon-lamp-10cm",
@@ -454,9 +563,28 @@
               "No stand"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Placement",
+            "label": "Base clearance or placement constraints (optional)",
+            "placeholder": "e.g. shelf is 180 mm tall",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Stand": {
+          "Light wood": [
+            "/renders/variants/moon-lamp-10cm-1.jpg"
+          ],
+          "Black": [
+            "/renders/variants/moon-lamp-10cm-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "lithophane-photo-box",
@@ -507,9 +635,28 @@
               }
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Panel order",
+            "label": "Photo arrangement (optional)",
+            "placeholder": "Identify the front photo and list the others clockwise",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Frame colour": {
+          "Black": [
+            "/renders/variants/lithophane-photo-box-1.jpg"
+          ],
+          "White": [
+            "/renders/variants/lithophane-photo-box-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "pet-memorial-light",
@@ -545,9 +692,28 @@
               "Grey"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Crop",
+            "label": "Photo cropping instructions (optional)",
+            "placeholder": "e.g. include both ears and the collar",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Shape": {
+          "Circle": [
+            "/renders/variants/pet-memorial-light-1.jpg"
+          ],
+          "Heart": [
+            "/renders/variants/pet-memorial-light-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "led-name-sign",
@@ -599,9 +765,28 @@
               "Desk stand"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Cable exit",
+            "label": "Preferred cable exit viewed from the front (optional)",
+            "placeholder": "e.g. left side nearest the outlet",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Black / Cyan": [
+            "/renders/variants/led-name-sign-1.jpg"
+          ],
+          "Black / Magenta": [
+            "/renders/variants/led-name-sign-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "personalised-headphone-stand",
@@ -633,9 +818,28 @@
               "Block"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Headband",
+            "label": "Headband width (mm) (optional)",
+            "placeholder": "Measure across the top of the headband",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Font": {
+          "Script": [
+            "/renders/variants/personalised-headphone-stand-1.jpg"
+          ],
+          "Block": [
+            "/renders/variants/personalised-headphone-stand-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "desk-nameplate",
@@ -679,14 +883,33 @@
             "label": "Second line (optional)",
             "placeholder": "Title, team or room",
             "max": 30
+          },
+          {
+            "name": "Text layout",
+            "label": "Text alignment preference (optional)",
+            "placeholder": "e.g. centre the name above the title",
+            "max": 120
           }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Style": {
+          "Wedge": [
+            "/renders/variants/desk-nameplate-1.jpg"
+          ],
+          "Flat with stand": [
+            "/renders/variants/desk-nameplate-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "wall-name-sign",
-      "images": [],
+      "images": [
+        "/renders/variants/wall-name-sign-1.jpg"
+      ],
       "name": "Wall Name Sign",
       "type": "made-to-order",
       "category": "gifts",
@@ -720,10 +943,29 @@
               "Plain"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Space",
+            "label": "Available wall space (mm) (optional)",
+            "placeholder": "Width × height",
+            "max": 120
+          }
         ]
       },
       "safety": "Wall decor for adults. Securely mount away from heat. Not a toy or a children’s product.",
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Font": {
+          "Script": [
+            "/renders/variants/wall-name-sign-1.jpg"
+          ],
+          "Block": [
+            "/renders/variants/wall-name-sign-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "qr-review-stand",
@@ -772,9 +1014,28 @@
               "Arch"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Call to action",
+            "label": "Words to print above the code (optional)",
+            "placeholder": "e.g. Scan to see our menu",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Shape": {
+          "Rectangle": [
+            "/renders/variants/qr-review-stand-1.jpg"
+          ],
+          "Arch": [
+            "/renders/variants/qr-review-stand-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "cottage-lake-topo-map",
@@ -813,10 +1074,29 @@
               "No frame"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Map centre",
+            "label": "Map centre or coordinates (optional)",
+            "placeholder": "e.g. latitude and longitude of the cottage",
+            "max": 120
+          }
         ]
       },
       "credit": "Elevation data: Natural Resources Canada (CDEM)",
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Frame": {
+          "Natural wood": [
+            "/renders/variants/cottage-lake-topo-map-1.jpg"
+          ],
+          "Black": [
+            "/renders/variants/cottage-lake-topo-map-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
     },
     {
       "slug": "gridfinity-drawer-kit",
@@ -849,9 +1129,113 @@
               "Kitchen utensils"
             ]
           }
+        ],
+        "fields": [
+          {
+            "name": "Obstructions",
+            "label": "Drawer obstructions and clearances (mm) (optional)",
+            "placeholder": "e.g. rear left hinge projects 12 mm",
+            "max": 120
+          }
         ]
       },
-      "productionReady": false
+      "productionReady": false,
+      "optionImages": {
+        "Bin mix": {
+          "Small parts": [
+            "/renders/variants/gridfinity-drawer-kit-1.jpg"
+          ],
+          "Tools": [
+            "/renders/variants/gridfinity-drawer-kit-2.jpg"
+          ]
+        }
+      },
+      "acceptMadeToOrder": true
+    },
+    {
+      "slug": "fold-vase",
+      "name": "Fold Vase · 23 cm",
+      "type": "made-to-order",
+      "category": "home",
+      "price": 175,
+      "materialCost": 18,
+      "printHours": 8,
+      "material": "PLA",
+      "colours": 1,
+      "options": {
+        "colour": [
+          "Deep Taupe",
+          "Chalk",
+          "Graphite"
+        ],
+        "fields": [
+          {
+            "name": "Display space",
+            "label": "Available shelf height (mm) (optional)",
+            "placeholder": "Include clearance for stems if needed",
+            "max": 120
+          }
+        ]
+      },
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Chalk": [
+            "/renders/variants/fold-vase-1.jpg"
+          ],
+          "Graphite": [
+            "/renders/variants/fold-vase-2.jpg"
+          ],
+          "Deep Taupe": [
+            "/renders/variants/vase-hero-1.jpg"
+          ]
+        }
+      },
+      "images": [
+        "/renders/variants/vase-hero-1.jpg"
+      ],
+      "acceptMadeToOrder": true
+    },
+    {
+      "slug": "tide-centerpiece",
+      "name": "Tide Centrepiece · 21 cm",
+      "type": "made-to-order",
+      "category": "home",
+      "price": 145,
+      "materialCost": 12,
+      "printHours": 6,
+      "material": "PLA",
+      "colours": 1,
+      "options": {
+        "colour": [
+          "Deep Taupe",
+          "Chalk",
+          "Graphite"
+        ],
+        "fields": [
+          {
+            "name": "Display space",
+            "label": "Available tabletop area (mm) (optional)",
+            "placeholder": "Width × depth of the display area",
+            "max": 120
+          }
+        ]
+      },
+      "productionReady": false,
+      "optionImages": {
+        "Colour": {
+          "Deep Taupe": [
+            "/renders/variants/tide-centerpiece-1.jpg"
+          ],
+          "Chalk": [
+            "/renders/variants/tide-centerpiece-2.jpg"
+          ]
+        }
+      },
+      "images": [
+        "/renders/variants/tide-centerpiece-1.jpg"
+      ],
+      "acceptMadeToOrder": true
     }
   ],
   "phase2": [

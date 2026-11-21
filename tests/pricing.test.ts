@@ -70,3 +70,19 @@ test('bag display reprices bulk quantities and keeps setup charged once',()=>{
   assert.equal(cartDisplayPrice(products,{slug:'qr-review-stand',quantity:1,options:{Link:'https://example.test'},files:['uploads/2026-11/logo.png']}),40);
   assert.equal(cartDisplayPrice(products,{slug:'desk-nameplate',quantity:10,options:{Text:'Cam'}}),22);
 });
+
+test('mixed controller packs require a breakdown and preserve it for production', () => {
+  const line = { slug: 'controller-wall-mount-4-pack', quantity: 1 };
+  const mixed = { Controller: 'Mixed (tell us below)' };
+  assert.throws(() => priceLine(products, { ...line, options: mixed }), /Controller models/i);
+  assert.equal(priceLine(products, { ...line, options: { ...mixed, Mix: '2 PS5, 2 Xbox' } }).options.Mix, '2 PS5, 2 Xbox');
+  assert.doesNotThrow(() => priceLine(products, line));
+});
+
+test('production details survive pricing and essential print inputs are required', () => {
+  const line = priceLine(products, { slug: 'fold-vase', quantity: 1, options: { 'Display space': '300 mm' } });
+  assert.equal(line.options['Display space'], '300 mm');
+  for (const slug of ['qr-review-stand', 'cottage-lake-topo-map', 'gridfinity-drawer-kit']) {
+    assert.throws(() => priceLine(products, { slug, quantity: 1 }), /Please add/);
+  }
+});
