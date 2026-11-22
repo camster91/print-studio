@@ -6,7 +6,7 @@ import Faq from '../components/Faq.astro';
 import { products, filamentColours, priceLabel } from '../lib/products';
 import { faq } from '../data/faq';
 import reviewsData from '../data/reviews.json';
-import { site } from '../config/site';
+
 
 const featured = ['led-name-sign', 'lithophane-photo-box', 'qr-review-stand', 'battery-mounts'].map((s) => products.find((p) => p.slug === s)!);
 const heroSlides = [
@@ -17,10 +17,11 @@ const heroSlides = [
   ['battery-mounts', '/renders/m18-battery-mount-5-pack.webp', 'Battery mounts on a garage wall'],
 ].map(([slug, src, alt]) => ({ p: products.find((x) => x.slug === slug)!, src, alt }));
 const reviews = reviewsData.reviews as { quote: string; name: string; product: string; stars: number }[];
+const ledNameSign = products.find((p) => p.slug === 'led-name-sign')!;
 const ledSigns = [
-  { title: 'Streamer name', cap: 'NAME SIGN, LIT, DARK DESK', glow: 'cyan', src: '/renders/led-name-sign.webp' },
-  { title: 'Podcast ON AIR', cap: 'ON AIR BOX, LIT', glow: 'magenta', src: '/renders/on-air-light-box.webp' },
-  { title: 'Room sign', cap: 'NAME SIGN ABOVE DESK, LIT', glow: 'accent', src: '/renders/home-led-studio.webp' },
+  { product: ledNameSign, title: 'Streamer name', cap: 'NAME SIGN, LIT, DARK DESK', glow: 'cyan', src: '/renders/led-name-sign.webp' },
+  { product: products.find((p) => p.slug === 'on-air-light-box')!, title: 'Podcast ON AIR', cap: 'ON AIR BOX, LIT', glow: 'magenta', src: '/renders/on-air-light-box.webp' },
+  { product: ledNameSign, title: 'Room sign', cap: 'NAME SIGN ABOVE DESK, LIT', glow: 'accent', src: '/renders/home-led-studio.webp' },
 ];
 const steps = [
   ['01', 'Upload', 'Send a photo, logo, sketch or STL. No file? Just describe it.'],
@@ -32,7 +33,7 @@ const buildTypes = ['Personalised sign', 'QR / business stand', 'Lithophane', 'R
 const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', 'Proof before we print', 'Made to order'];
 ---
 
-<BaseLayout title={site.name} description="Personalised 3D prints made in Toronto: lithophane photo lamps, LED name signs, QR review stands, garage mounts and custom builds.">
+<BaseLayout title="Custom 3D Printing in Toronto" description="Personalised 3D prints made in Toronto: lithophane photo lamps, LED name signs, QR review stands, garage mounts and custom builds.">
   <!-- HERO -->
   <section class="hero">
     <div class="container hero__grid">
@@ -98,7 +99,7 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
         </div>
       </div>
       <div class="swiper-pagination mobile-only" data-pagination></div>
-      <div class="center-cta"><a href="/shop" class="btn btn--dark">See all {products.length} products</a></div>
+      <div class="center-cta"><a href="/shop" class="btn btn--dark">Browse all prints</a></div>
     </div>
   </section>
 
@@ -144,9 +145,9 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
       <div class="swiper" data-swiper="rail">
         <div class="swiper-wrapper">
           {ledSigns.map((s) => (
-            <a href="/products/led-name-sign" class="swiper-slide led__slide">
+            <a href={`/products/${s.product.slug}`} class="swiper-slide led__slide">
               <Photo caption={s.cap} src={s.src} tone="dark" class={`led__photo glow-${s.glow}`} />
-              <span class="row led__meta"><span class="label-l">{s.title}</span><span class="mono-s">From $45</span></span>
+              <span class="row led__meta"><span class="label-l">{s.title}</span><span class="mono-s">{priceLabel(s.product)}</span></span>
             </a>
           ))}
         </div>
@@ -166,7 +167,7 @@ const marquee = ['Printed in Toronto', 'Local pickup', '5–7 day turnaround', '
           <tbody>
             <tr><td>1 QR stand</td><td>$25</td></tr>
             <tr><td>3–9 stands</td><td>$20 each</td></tr><tr><td>10+ stands</td><td>$17 each</td></tr>
-            <tr><td>Logo setup (one time)</td><td>$15</td></tr>
+            <tr><td>Logo setup per uploaded design</td><td>$15</td></tr>
             <tr><td>NFC tap-to-review add-on</td><td>+$15</td></tr>
           </tbody>
         </table>

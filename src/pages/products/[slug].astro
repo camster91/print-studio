@@ -19,9 +19,9 @@ const startSize = p.options.size?.find((s) => s.price === p.price) ?? p.options.
 const startPrice = unitPrice(p, {}, 1);
 const choices = p.options.choices ?? [];
 const fields = p.options.fields ?? [];
-const placeholderShots = p.led ? ['Hero, lit', 'Unlit, daylight', 'Detail of layers', 'In hand, for scale', 'In use'] : ['Hero', 'Detail of layers', 'In hand, for scale', 'In use', 'All colours'];
+
 const galleryImages = productImages(p);
-const shots = galleryImages.length ? galleryImages.map((_, i) => (i === 0 ? 'Hero' : `Photo ${i + 1}`)) : placeholderShots;
+const shots = galleryImages.map((_, i) => i === 0 ? p.name : `${p.name}, view ${i + 1}`);
 const related = products.filter((x) => x.slug !== p.slug && (x.category === p.category || x.type === p.type)).slice(0, 4);
 const photoCount = p.options.photos ?? 0;
 const needsLogo = p.options.logo;
@@ -42,7 +42,8 @@ const details = [
     <div class="pdp__gallery">
       <div class="swiper gallery" data-swiper="gallery">
         <div class="swiper-wrapper">
-          {shots.map((s, i) => <div class="swiper-slide"><Photo caption={`${p.name} — ${s}`} src={galleryImages[i]} tone={p.led && i === 0 ? 'warm' : 'default'} class="gallery__photo" eager={i === 0} /></div>)}
+          {!shots.length && <div class="swiper-slide"><p class="note">A preview for this selection is coming soon.</p></div>}
+          {shots.map((s, i) => <div class="swiper-slide"><Photo caption={s} src={galleryImages[i]} tone={p.led && i === 0 ? 'warm' : 'default'} class="gallery__photo" eager={i === 0} /></div>)}
         </div>
       </div>
       <div class="thumbs" hidden={shots.length < 2}>
@@ -124,7 +125,7 @@ const details = [
               <label class="slot"><input type="file" accept={needsLogo ? '.svg,.png,.pdf,image/*' : 'image/*'} data-slot={i} /><span class="label-m">+ Add</span></label>
             ))}
           </div>
-          <p class="body-s" data-upload-msg>Bright, close-up photos work best. You can also email them after checkout.</p>
+          <p class="body-s" data-upload-msg>{needsLogo ? 'Upload a clear logo file for the printed design.' : 'Bright, close-up photos work best. You can also email them after checkout.'}</p>
           <label class="check"><input type="checkbox" name="rights" required /> I own these photos/logos or have permission to use them.</label>
         </fieldset>
       )}
@@ -136,11 +137,12 @@ const details = [
       <div class="field opt" data-gift-field hidden><label for="gift">Gift note</label><textarea id="gift" class="textarea" name="Gift note" maxlength="200"></textarea></div>
 
       <p class="body-s">Need a different size, a new design, or a print from your own file? <a href={`/custom?product=${p.slug}`}>Request a custom version of {p.name}</a>.</p>
+      {p.setupFee && <p class="body-s" aria-live="polite" data-setup-note>Logo setup adds {money(p.setupFee)} per uploaded design. One with a logo totals {money(startPrice + p.setupFee)} CAD before shipping and tax.</p>}
       <div class="buy__row">
         <div class="qty" role="group" aria-label="Quantity"><button type="button" data-q="-1" aria-label="One fewer">–</button><output data-qty>1</output><button type="button" data-q="1" aria-label="One more">+</button></div>
         <button class="btn btn--primary buy__add" data-add>Add to bag · <span data-total>{money(startPrice)}</span></button>
       </div>
-      {p.bulk && <p class="mono-s kicker">{p.bulk.map((b) => `${b.min}+ ${money(b.price)} each`).join(' · ')}{p.setupFee ? ` · logo setup ${money(p.setupFee)} once` : ''}</p>}
+      {p.bulk && <p class="mono-s kicker">{p.bulk.map((b) => `${b.min}+ ${money(b.price)} each`).join(' · ')}</p>}
       {mto && site.holidayCutoff && <p class="note body-s" data-cutoff="2026-12-05T00:00:00-05:00" hidden>Order custom work by {site.holidayCutoff}. We email a proof before we print.</p>}
       <div class="row gap-8 wrap">{(mto ? ['Proof before print', 'Made in 5–7 days'] : ['Ships in 1–2 days', 'Toronto pickup']).concat(p.led ? ['USB LED · approval check required'] : []).map((t) => <span class="tag">{t}</span>)}</div>
       <p class="body-s buy__error" role="alert" data-error></p>
@@ -210,6 +212,10 @@ const details = [
     const total = u * qty + (setup && files.some(Boolean) ? setup : 0);
     form.querySelector('[data-price]')!.textContent = money(u);
     form.querySelector('[data-total]')!.textContent = money(total);
+    const note = form.querySelector('[data-setup-note]');
+    if (note) note.textContent = files.some(Boolean)
+      ? `Logo setup ${money(setup)} included. Item subtotal ${money(total)} CAD before shipping and tax.`
+      : `Add a logo for ${money(setup)} per design. Subtotal with a logo: ${money(total + setup)} CAD before shipping and tax.`;
     form.querySelector('[data-qty]')!.textContent = String(qty);
     document.querySelector('[data-total-sticky]')!.textContent = money(total);
     const colour = form.querySelector<HTMLInputElement>('.swatch input:checked');

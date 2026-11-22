@@ -163,11 +163,16 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 </BaseLayout>
 
 <script>
+  import { onDemandDesigns } from '../data/on-demand-designs';
   import { bySlug } from '../lib/products';
   import { submitQuote } from '../lib/quote';
   import { lenis } from '../lib/motion';
 
-  const SAVE = 'layerline-build';
+  const params = new URLSearchParams(location.search);
+  const requestedSlug = params.get('product') ?? '';
+  const design = onDemandDesigns.find((item) => item.slug === requestedSlug);
+  const startingDesign = bySlug(requestedSlug)?.name ?? design?.name ?? '';
+  const SAVE = startingDesign ? `layerline-build:${requestedSlug}` : 'layerline-build';
   const form = document.querySelector<HTMLFormElement>('[data-build]')!;
   const panels = [...form.querySelectorAll<HTMLFieldSetElement>('[data-step-panel]')];
   const items = [...document.querySelectorAll<HTMLElement>('[data-stepper-item]')];
@@ -181,17 +186,20 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 
   // Prefill from ?type= (homepage step 1) and saved progress
   try {
-    const saved = JSON.parse(localStorage.getItem(SAVE) ?? '{}');
+    const scoped = localStorage.getItem(SAVE);
+    const legacy = JSON.parse(localStorage.getItem('layerline-build') ?? '{}');
+    const saved = scoped ? JSON.parse(scoped) : legacy.startingDesign === startingDesign ? legacy : {};
     for (const [k, v] of Object.entries(saved)) {
       const els = form.querySelectorAll<HTMLInputElement>(`[name="${k}"]`);
       els.forEach((el) => { if (el.type === 'radio' || el.type === 'checkbox') el.checked = el.value === v; else if (el.type !== 'file') el.value = String(v); });
     }
   } catch {}
   const sourceField = form.querySelector<HTMLInputElement>('[name="startingDesign"]')!;
-  const requestedSlug = new URLSearchParams(location.search).get('product');
-  if (requestedSlug) sourceField.value = bySlug(requestedSlug)?.name ?? '';
+  if (requestedSlug) sourceField.value = startingDesign;
   sourceField.closest<HTMLElement>('[data-source-product]')!.hidden = !sourceField.value;
-  const typeParam = new URLSearchParams(location.search).get('type');
+  const description = form.querySelector<HTMLTextAreaElement>('[name="description"]')!;
+  if (design && !description.value) description.value = `Please quote the ${design.name}.`;
+  const typeParam = params.get('type');
   if (typeParam) form.querySelectorAll<HTMLInputElement>('[name="type"]').forEach((r) => (r.checked = r.value === typeParam));
 
   const val = (n: string) => (form.elements.namedItem(n) as RadioNodeList | HTMLInputElement | null)?.value ?? '';
@@ -203,6 +211,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
   }
 
   function estimate() {
+    if (design) return 'Price by quote';
     const from = Number(form.querySelector<HTMLInputElement>('[name="type"]:checked')?.dataset.from ?? 0);
     if (!from) return 'Quote in 24 h';
     const q = Math.max(1, Number(val('quantity')) || 1);
@@ -218,7 +227,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 
   function paintSummary() {
     const rows: [string, string][] = [
-      ['Item', val('type')],
+      ['Item', sourceField.value || val('type')],
       ['Files', files.length ? `${files.length} added` : val('description') ? 'Described' : '—'],
       ['Size', step >= 2 ? val('size') : '—'],
       ['Colour', step >= 2 ? val('colour') : '—'],
@@ -259,6 +268,11 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
 
   function renderFiles() {
     const list = form.querySelector('[data-file-list]')!;
+    if (design) {
+      const rights = form.querySelector<HTMLInputElement>('[name="rights"]')!;
+      rights.required = files.length > 0;
+      rights.closest('label')!.hidden = !files.length;
+    }
     list.replaceChildren(...files.map((f, i) => {
       const li = document.createElement('li');
       li.innerHTML = `<span class="files__thumb"></span><span class="label-m"></span><span class="mono-s"></span><button type="button" aria-label="Remove">×</button>`;
@@ -321,6 +335,7 @@ const budgets = ['Under $25', '$25–$50', '$50–$100', '$100–$250', '$250+']
   });
 
   form.dispatchEvent(new Event('change'));
+  renderFiles();
   show(0);
   window.scrollTo({ top: 0 });
 </script>
